@@ -16,9 +16,9 @@
     * { box-sizing:border-box; margin:0; padding:0; }
     body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding-bottom:var(--nav-h); }
     h1,h2,h3 { font-family:'Bebas Neue',sans-serif; letter-spacing:2px; }
-    .screen { display:none; width:100%; max-width:480px; padding:24px 20px 16px; height:calc(100vh - var(--nav-h)); flex-direction:column; position:relative; overflow-y:auto; }
+    .screen { display:none; width:100%; max-width:480px; padding:24px 20px 16px; min-height:calc(100vh - var(--nav-h)); flex-direction:column; position:relative; overflow-y:auto; }
     .screen.active { display:flex; }
-    #screen-liga { overflow:hidden; padding:0; }
+    #screen-liga { overflow:hidden; padding:0; min-height:unset; height:calc(100vh - var(--nav-h)); }
     .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:#111; border-top:1px solid #222; display:flex; align-items:center; justify-content:space-around; z-index:500; max-width:480px; margin:0 auto; }
     .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border:none; background:none; color:var(--muted); transition:color 0.2s; flex:1; }
     .nav-item.active { color:var(--gold); }
