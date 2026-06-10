@@ -13,274 +13,152 @@
       --surface: #1a1a1a;
       --surface2: #242424;
       --gold: #f5c400;
-      --gold2: #e6b800;
-      --brown: #8B4513;
       --text: #f0f0f0;
       --muted: #888;
       --danger: #e84040;
       --green: #3ecf8e;
       --radius: 16px;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h1, h2, h3, .display {
-      font-family: 'Bebas Neue', sans-serif;
-      letter-spacing: 2px;
-    }
-
-    /* SCREENS */
-    .screen {
-      display: none;
-      width: 100%;
-      max-width: 480px;
-      padding: 24px 20px;
-      min-height: 100vh;
-      flex-direction: column;
-    }
+    .screen { display: none; width: 100%; max-width: 480px; padding: 24px 20px; min-height: 100vh; flex-direction: column; position: relative; }
     .screen.active { display: flex; }
 
     /* LANDING */
-    #screen-landing {
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      gap: 32px;
-    }
-
-    .logo-block { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    #screen-landing { justify-content: center; align-items: center; text-align: center; gap: 32px; }
     .logo-emoji { font-size: 80px; animation: bounce 2s infinite; }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
-    }
-    .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 64px; color: var(--gold); letter-spacing: 4px; line-height: 1; }
-    .logo-sub { font-size: 13px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    .logo-text { font-family:'Bebas Neue',sans-serif; font-size:64px; color:var(--gold); letter-spacing:4px; line-height:1; }
+    .logo-sub { font-size:13px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+    .tagline { font-size:15px; color:var(--muted); max-width:280px; line-height:1.6; }
+    .btn-stack { display:flex; flex-direction:column; gap:12px; width:100%; max-width:320px; }
 
-    .tagline { font-size: 15px; color: var(--muted); max-width: 280px; line-height: 1.6; }
-
-    .btn-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
-
-    .btn {
-      padding: 16px 24px;
-      border-radius: var(--radius);
-      border: none;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
-      letter-spacing: 2px;
-      cursor: pointer;
-      transition: transform 0.1s, opacity 0.1s;
-      width: 100%;
-    }
-    .btn:active { transform: scale(0.97); opacity: 0.9; }
-    .btn-primary { background: var(--gold); color: #000; }
-    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid #333; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-muted { background: transparent; color: var(--muted); font-size: 16px; font-family: 'Inter', sans-serif; padding: 12px; }
+    /* BOTONES */
+    .btn { padding:16px 24px; border-radius:var(--radius); border:none; font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; cursor:pointer; transition:transform 0.1s,opacity 0.1s; width:100%; }
+    .btn:active { transform:scale(0.97); opacity:0.9; }
+    .btn-primary { background:var(--gold); color:#000; }
+    .btn-secondary { background:var(--surface2); color:var(--text); border:1px solid #333; }
 
     /* FORMS */
-    .form-screen { gap: 24px; padding-top: 60px; }
-    .back-btn { position: absolute; top: 20px; left: 20px; background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer; }
-    .screen { position: relative; }
+    .form-screen { gap:24px; padding-top:60px; }
+    .back-btn { position:absolute; top:20px; left:20px; background:none; border:none; color:var(--muted); font-size:24px; cursor:pointer; }
+    .form-header { text-align:center; }
+    .form-header h2 { font-size:42px; color:var(--gold); }
+    .form-header p { font-size:14px; color:var(--muted); margin-top:8px; }
+    .field { display:flex; flex-direction:column; gap:8px; }
+    .field label { font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+    .field input,.field select { background:var(--surface2); border:1px solid #333; border-radius:12px; color:var(--text); font-family:'Inter',sans-serif; font-size:16px; padding:14px 16px; outline:none; transition:border-color 0.2s; width:100%; }
+    .field input:focus,.field select:focus { border-color:var(--gold); }
+    .field select option { background:var(--surface2); }
+    .error-msg { color:var(--danger); font-size:13px; text-align:center; display:none; }
 
-    .form-header { text-align: center; }
-    .form-header h2 { font-size: 42px; color: var(--gold); }
-    .form-header p { font-size: 14px; color: var(--muted); margin-top: 8px; }
+    /* INVITE */
+    .invite-box { background:var(--surface); border-radius:var(--radius); padding:20px; display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center; }
+    .invite-link { background:var(--surface2); border-radius:10px; padding:12px 16px; font-size:13px; color:var(--muted); word-break:break-all; width:100%; }
 
-    .field { display: flex; flex-direction: column; gap: 8px; }
-    .field label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-    .field input, .field select {
-      background: var(--surface2);
-      border: 1px solid #333;
-      border-radius: 12px;
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      padding: 14px 16px;
-      outline: none;
-      transition: border-color 0.2s;
-      width: 100%;
+    /* MIS LIGAS */
+    #screen-misligas { gap:16px; padding-top:60px; }
+    .liga-card { background:var(--surface); border-radius:var(--radius); padding:16px 20px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:background 0.2s; border:1px solid transparent; }
+    .liga-card:active { background:var(--surface2); }
+    .liga-card.activa { border-color:var(--gold); }
+    .liga-card-info { flex:1; }
+    .liga-card-nombre { font-weight:700; font-size:16px; }
+    .liga-card-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+    .liga-card-pos { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); }
+    .ligas-empty { text-align:center; color:var(--muted); padding:40px 0; font-size:14px; }
+
+    /* LIGA */
+    #screen-liga { gap:20px; padding-top:20px; }
+    .liga-header { text-align:center; padding:16px; background:var(--surface); border-radius:var(--radius); position:relative; }
+    .liga-nombre { font-size:32px; color:var(--gold); font-family:'Bebas Neue',sans-serif; letter-spacing:2px; }
+    .liga-timer { font-size:13px; color:var(--muted); margin-top:4px; }
+    .mis-ligas-btn { position:absolute; top:12px; right:12px; background:var(--surface2); border:none; border-radius:8px; color:var(--muted); font-size:11px; padding:6px 10px; cursor:pointer; font-family:'Inter',sans-serif; }
+
+    .clasificacion { display:flex; flex-direction:column; gap:8px; }
+    .clasificacion-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--muted); letter-spacing:2px; }
+    .jugador-row { display:flex; align-items:center; gap:12px; background:var(--surface); border-radius:14px; padding:14px 16px; }
+    .jugador-row.me { background:var(--surface2); border:1px solid var(--gold); }
+    .jugador-pos { font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--muted); width:28px; text-align:center; }
+    .jugador-pos.gold { color:var(--gold); }
+    .jugador-pos.silver { color:#C0C0C0; }
+    .jugador-pos.bronze { color:#CD7F32; }
+    .jugador-emoji { font-size:28px; }
+    .jugador-info { flex:1; }
+    .jugador-nombre { font-weight:600; font-size:15px; }
+    .jugador-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+    .jugador-count { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--gold); }
+
+    /* BOTÓN CAGAR */
+    .btn-cagar-wrap { display:flex; justify-content:center; padding:8px 0; }
+    .btn-cagar { width:200px; height:200px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#8B4513,#5c2d0a); border:4px solid var(--gold); font-size:60px; cursor:pointer; transition:transform 0.1s,box-shadow 0.1s; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+    .btn-cagar:active { transform:scale(0.93); }
+    .btn-cagar-label { font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:2px; color:var(--gold); }
+    .btn-cagar.shake { animation:shake 0.4s; }
+    @keyframes shake { 0%,100%{transform:translateX(0) scale(1)} 20%{transform:translateX(-6px) scale(1.05)} 40%{transform:translateX(6px) scale(1.05)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+
+    /* OVERLAY FRASE */
+    .frase-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.92);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      z-index:1000; gap:24px; padding:32px;
+      opacity:0; pointer-events:none; transition:opacity 0.3s;
     }
-    .field input:focus, .field select:focus { border-color: var(--gold); }
-    .field select option { background: var(--surface2); }
-
-    /* INVITE SCREEN */
-    .invite-box {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: center;
-      text-align: center;
-    }
-    .invite-link {
-      background: var(--surface2);
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 13px;
-      color: var(--muted);
-      word-break: break-all;
-      width: 100%;
-    }
-
-    /* LIGA SCREEN */
-    #screen-liga { gap: 20px; padding-top: 20px; }
-
-    .liga-header {
-      text-align: center;
-      padding: 16px;
-      background: var(--surface);
-      border-radius: var(--radius);
-    }
-    .liga-nombre { font-size: 36px; color: var(--gold); }
-    .liga-timer { font-size: 13px; color: var(--muted); margin-top: 4px; }
-
-    .clasificacion { display: flex; flex-direction: column; gap: 8px; }
-    .clasificacion-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--muted); letter-spacing: 2px; }
-
-    .jugador-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--surface);
-      border-radius: 14px;
-      padding: 14px 16px;
-      transition: background 0.2s;
-    }
-    .jugador-row.me { background: var(--surface2); border: 1px solid var(--gold); }
-    .jugador-pos { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--muted); width: 28px; text-align: center; }
-    .jugador-pos.gold { color: var(--gold); }
-    .jugador-pos.silver { color: #C0C0C0; }
-    .jugador-pos.bronze { color: #CD7F32; }
-    .jugador-emoji { font-size: 28px; }
-    .jugador-info { flex: 1; }
-    .jugador-nombre { font-weight: 600; font-size: 15px; }
-    .jugador-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .jugador-count { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--gold); }
-
-    /* BOTÓN CENTRAL */
-    .btn-cagar-wrap { display: flex; justify-content: center; padding: 8px 0; }
-    .btn-cagar {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #8B4513, #5c2d0a);
-      border: 4px solid var(--gold);
-      font-size: 60px;
-      cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.1s;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 0 rgba(245,196,0,0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-    .btn-cagar:active { transform: scale(0.93); box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
-    .btn-cagar-label { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px; color: var(--gold); }
-    .btn-cagar.shake { animation: shake 0.4s; }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0) scale(1); }
-      20% { transform: translateX(-6px) scale(1.05); }
-      40% { transform: translateX(6px) scale(1.05); }
-      60% { transform: translateX(-4px); }
-      80% { transform: translateX(4px); }
-    }
+    .frase-overlay.show { opacity:1; pointer-events:all; }
+    .frase-cuenta { font-family:'Bebas Neue',sans-serif; font-size:120px; color:var(--gold); line-height:1; animation:pulseCuenta 1s ease-in-out infinite; }
+    @keyframes pulseCuenta { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+    .frase-texto { font-family:'Bebas Neue',sans-serif; font-size:32px; color:#fff; text-align:center; letter-spacing:2px; line-height:1.3; max-width:320px; }
+    .frase-emoji { font-size:64px; }
 
     /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: var(--green);
-      color: #000;
-      font-weight: 700;
-      padding: 12px 24px;
-      border-radius: 50px;
-      font-size: 15px;
-      transition: transform 0.3s;
-      z-index: 999;
-      white-space: nowrap;
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast { position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--green); color:#000; font-weight:700; padding:12px 24px; border-radius:50px; font-size:15px; transition:transform 0.3s; z-index:999; white-space:nowrap; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
 
     /* STATS */
-    #screen-stats { gap: 20px; padding-top: 60px; }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .stat-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .stat-card.full { grid-column: 1 / -1; }
-    .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-    .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--gold); }
-    .stat-sub { font-size: 12px; color: var(--muted); }
+    #screen-stats { gap:20px; padding-top:60px; }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .stat-card { background:var(--surface); border-radius:var(--radius); padding:16px; display:flex; flex-direction:column; gap:4px; }
+    .stat-card.full { grid-column:1/-1; }
+    .stat-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+    .stat-value { font-family:'Bebas Neue',sans-serif; font-size:40px; color:var(--gold); }
+    .stat-sub { font-size:12px; color:var(--muted); }
 
     /* FINAL */
-    #screen-final { justify-content: center; align-items: center; text-align: center; gap: 24px; }
-    .podio { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-    .podio-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-    }
-    .podio-item.primero { background: linear-gradient(135deg, #2a2200, #1a1a1a); border: 1px solid var(--gold); }
-    .podio-medal { font-size: 32px; }
-    .podio-info { flex: 1; text-align: left; }
-    .podio-nombre { font-weight: 700; font-size: 16px; }
-    .podio-cacas { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); }
+    #screen-final { justify-content:center; align-items:center; text-align:center; gap:24px; }
+    .podio { display:flex; flex-direction:column; gap:12px; width:100%; }
+    .podio-item { display:flex; align-items:center; gap:16px; background:var(--surface); border-radius:var(--radius); padding:16px 20px; }
+    .podio-item.primero { background:linear-gradient(135deg,#2a2200,#1a1a1a); border:1px solid var(--gold); }
+    .podio-medal { font-size:32px; }
+    .podio-info { flex:1; text-align:left; }
+    .podio-nombre { font-weight:700; font-size:16px; }
+    .podio-cacas { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); }
+    .shame-box { background:var(--surface); border:1px solid var(--danger); border-radius:var(--radius); padding:20px; width:100%; }
+    .shame-title { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--danger); letter-spacing:2px; }
+    .shame-name { font-size:20px; font-weight:700; margin-top:8px; }
+    .shame-sub { font-size:13px; color:var(--muted); margin-top:4px; }
 
-    .shame-box {
-      background: var(--surface);
-      border: 1px solid var(--danger);
-      border-radius: var(--radius);
-      padding: 20px;
-      width: 100%;
-    }
-    .shame-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--danger); letter-spacing: 2px; }
-    .shame-name { font-size: 20px; font-weight: 700; margin-top: 8px; }
-    .shame-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
-
-    /* LOADING */
-    .loading { text-align: center; color: var(--muted); padding: 40px; }
-    .spinner { width: 32px; height: 32px; border: 3px solid #333; border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* UTILS */
-    .divider { height: 1px; background: #222; }
-    .text-center { text-align: center; }
-    .text-muted { color: var(--muted); font-size: 13px; }
-    .mt-auto { margin-top: auto; }
+    .loading { text-align:center; color:var(--muted); padding:40px; }
+    .spinner { width:32px; height:32px; border:3px solid #333; border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .mt-auto { margin-top:auto; }
   </style>
 </head>
 <body>
 
+<!-- OVERLAY FRASE GRANDE -->
+<div class="frase-overlay" id="frase-overlay">
+  <div class="frase-emoji">💩</div>
+  <div class="frase-cuenta" id="frase-cuenta">3</div>
+  <div class="frase-texto" id="frase-texto"></div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- PANTALLA 1: LANDING -->
+<!-- LANDING -->
 <div class="screen active" id="screen-landing">
-  <div class="logo-block">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
     <div class="logo-emoji">💩</div>
     <div class="logo-text">CaCup</div>
     <div class="logo-sub">La competición más seria del mundo</div>
@@ -292,13 +170,10 @@
   </div>
 </div>
 
-<!-- PANTALLA 2: CREAR LIGA -->
+<!-- CREAR LIGA -->
 <div class="screen form-screen" id="screen-crear">
-  <button class="back-btn" onclick="showScreen('screen-landing')">←</button>
-  <div class="form-header">
-    <h2>NUEVA LIGA</h2>
-    <p>Configura tu campeonato</p>
-  </div>
+  <button class="back-btn" onclick="goBack()">←</button>
+  <div class="form-header"><h2>NUEVA LIGA</h2><p>Configura tu campeonato</p></div>
   <div class="field">
     <label>Nombre de la liga</label>
     <input type="text" id="liga-nombre" placeholder="Ej: Los Cagones del Barrio" maxlength="40" />
@@ -316,89 +191,83 @@
     </select>
   </div>
   <button class="btn btn-primary" onclick="crearLiga()">Crear liga 💩</button>
-  <div id="crear-error" class="text-muted text-center" style="color: var(--danger); display:none;"></div>
+  <div class="error-msg" id="crear-error"></div>
 </div>
 
-<!-- PANTALLA 3: INVITACIÓN -->
+<!-- INVITACIÓN -->
 <div class="screen form-screen" id="screen-invitacion">
-  <div class="form-header">
-    <h2>¡LIGA CREADA!</h2>
-    <p>Comparte el link con tus amigos</p>
-  </div>
+  <div class="form-header"><h2>¡LIGA CREADA!</h2><p>Comparte el link con tus amigos</p></div>
   <div class="invite-box">
-    <div style="font-size: 48px;">🏆</div>
-    <div id="invite-liga-nombre" style="font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold);"></div>
+    <div style="font-size:48px;">🏆</div>
+    <div id="invite-liga-nombre" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);"></div>
     <div class="invite-link" id="invite-link-text"></div>
     <button class="btn btn-primary" onclick="compartirLink()">📤 Compartir por WhatsApp</button>
     <button class="btn btn-secondary" onclick="copiarLink()">📋 Copiar link</button>
   </div>
-  <button class="btn btn-primary" onclick="entrarALiga()" style="margin-top: 8px;">Entrar a mi liga →</button>
+  <button class="btn btn-primary" onclick="entrarALiga()" style="margin-top:8px;">Entrar a mi liga →</button>
 </div>
 
-<!-- PANTALLA 4: UNIRSE -->
+<!-- UNIRSE -->
 <div class="screen form-screen" id="screen-unirse">
-  <button class="back-btn" onclick="showScreen('screen-landing')">←</button>
-  <div class="form-header">
-    <h2>UNIRSE</h2>
-    <p>Entra a la liga de tus amigos</p>
-  </div>
+  <button class="back-btn" onclick="goBack()">←</button>
+  <div class="form-header"><h2>UNIRSE</h2><p>Entra a la liga de tus amigos</p></div>
   <div class="field">
     <label>Código de liga</label>
-    <input type="text" id="unirse-codigo" placeholder="Ej: ABC123" maxlength="8" style="text-transform: uppercase; letter-spacing: 4px; font-family: 'Bebas Neue', sans-serif; font-size: 28px;" />
+    <input type="text" id="unirse-codigo" placeholder="Ej: ABC123" maxlength="8" style="text-transform:uppercase;letter-spacing:4px;font-family:'Bebas Neue',sans-serif;font-size:28px;" />
   </div>
   <div class="field">
     <label>Tu nombre o apodo</label>
     <input type="text" id="unirse-nombre" placeholder="Ej: El Novato" maxlength="20" />
   </div>
   <button class="btn btn-primary" onclick="unirseALiga()">Unirme 💩</button>
-  <div id="unirse-error" class="text-muted text-center" style="color: var(--danger); display:none;"></div>
+  <div class="error-msg" id="unirse-error"></div>
 </div>
 
-<!-- PANTALLA 5: SALA DE LIGA -->
+<!-- MIS LIGAS -->
+<div class="screen" id="screen-misligas">
+  <button class="back-btn" onclick="showScreen('screen-liga')">←</button>
+  <div class="form-header" style="margin-bottom:8px;">
+    <h2>MIS LIGAS</h2>
+    <p>Toca una liga para verla</p>
+  </div>
+  <div id="misligas-list"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+  <button class="btn btn-primary" onclick="showScreen('screen-crear')" style="margin-top:auto;">+ Crear nueva liga</button>
+  <button class="btn btn-secondary" onclick="showScreen('screen-unirse')" style="margin-top:8px;">🔗 Unirme a otra liga</button>
+</div>
+
+<!-- SALA DE LIGA -->
 <div class="screen" id="screen-liga">
   <div class="liga-header">
     <div class="liga-nombre" id="liga-nombre-display"></div>
     <div class="liga-timer" id="liga-timer"></div>
+    <button class="mis-ligas-btn" onclick="verMisLigas()">Mis ligas 📋</button>
   </div>
-
   <div class="clasificacion">
     <div class="clasificacion-title">Clasificación</div>
-    <div id="clasificacion-list">
-      <div class="loading"><div class="spinner"></div>Cargando...</div>
-    </div>
+    <div id="clasificacion-list"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
   </div>
-
   <div class="btn-cagar-wrap">
     <button class="btn-cagar" id="btn-cagar" onclick="registrarCaga()">
-      💩
-      <span class="btn-cagar-label">HE CAGADO</span>
+      💩<span class="btn-cagar-label">HE CAGADO</span>
     </button>
   </div>
-
-  <div style="display: flex; gap: 10px;">
-    <button class="btn btn-secondary" onclick="showStats()" style="flex: 1; font-size: 16px; padding: 12px;">📊 Mis stats</button>
-    <button class="btn btn-secondary" onclick="compartirLiga()" style="flex: 1; font-size: 16px; padding: 12px;">📤 Invitar</button>
+  <div style="display:flex;gap:10px;">
+    <button class="btn btn-secondary" onclick="showStats()" style="flex:1;font-size:16px;padding:12px;">📊 Mis stats</button>
+    <button class="btn btn-secondary" onclick="compartirLiga()" style="flex:1;font-size:16px;padding:12px;">📤 Invitar</button>
   </div>
 </div>
 
-<!-- PANTALLA 6: ESTADÍSTICAS -->
+<!-- ESTADÍSTICAS -->
 <div class="screen" id="screen-stats">
   <button class="back-btn" onclick="showScreen('screen-liga')">←</button>
-  <div class="form-header">
-    <h2>MIS STATS</h2>
-  </div>
-  <div class="stats-grid" id="stats-grid">
-    <div class="loading"><div class="spinner"></div></div>
-  </div>
-  <button class="btn btn-secondary mt-auto" onclick="showScreen('screen-liga')">← Volver a la liga</button>
+  <div class="form-header"><h2>MIS STATS</h2></div>
+  <div class="stats-grid" id="stats-grid"><div class="loading"><div class="spinner"></div></div></div>
+  <button class="btn btn-secondary mt-auto" onclick="showScreen('screen-liga')">← Volver</button>
 </div>
 
-<!-- PANTALLA 7: FINAL -->
+<!-- FINAL -->
 <div class="screen" id="screen-final">
-  <div class="form-header">
-    <h2>🏁 FIN DE LA LIGA</h2>
-    <p id="final-liga-nombre"></p>
-  </div>
+  <div class="form-header"><h2>🏁 FIN DE LA LIGA</h2><p id="final-liga-nombre"></p></div>
   <div class="podio" id="podio-list"></div>
   <div class="shame-box" id="shame-box">
     <div class="shame-title">💩 MURO DE LA VERGÜENZA</div>
@@ -409,43 +278,58 @@
 </div>
 
 <script>
-  // ─── SUPABASE CONFIG ───────────────────────────────────────
   const SUPABASE_URL = 'https://gnrocanwmuceasucequz.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imducm9jYW53bXVjZWFzdWNlcXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDU2NjIsImV4cCI6MjA5NjYyMTY2Mn0.PIRTT2ms8k8H9s0-oa5zyfq1vuXVpaLuXyb7QmEPKnQ';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // ─── ESTADO GLOBAL ─────────────────────────────────────────
-  let estado = {
-    ligaId: null,
-    ligaCodigo: null,
-    ligaNombre: null,
-    ligaFechaFin: null,
-    jugadorId: null,
-    jugadorNombre: null,
-    realtimeSub: null,
-  };
+  // ─── ESTADO ────────────────────────────────────────────────
+  // misLigas = array de { ligaId, ligaCodigo, ligaNombre, ligaFechaFin, jugadorId, jugadorNombre }
+  let misLigas = [];
+  let ligaActualIdx = 0;
+  let realtimeSub = null;
+  let timerInterval = null;
+  let cagandose = false;
+  let pantallaAnterior = 'screen-landing';
 
-  const EMOJIS = ['😤','🤴','👑','🦁','🐻','🦊','🐯','🤠','😎','🧙','🤡','👾'];
+  function ligaActual() { return misLigas[ligaActualIdx] || null; }
 
   // ─── NAVEGACIÓN ────────────────────────────────────────────
   function showScreen(id) {
+    pantallaAnterior = document.querySelector('.screen.active')?.id || 'screen-landing';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo(0, 0);
   }
+  function goBack() { showScreen(pantallaAnterior); }
 
   // ─── TOAST ─────────────────────────────────────────────────
-  function showToast(msg, duration = 2500) {
+  function showToast(msg, dur=2500) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), duration);
+    setTimeout(() => t.classList.remove('show'), dur);
   }
 
-  // ─── GENERAR CÓDIGO ÚNICO ──────────────────────────────────
+  // ─── UTILS ─────────────────────────────────────────────────
   function generarCodigo() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    return Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from({length:6}, () => c[Math.floor(Math.random()*c.length)]).join('');
+  }
+  const EMOJIS = ['😤','🤴','👑','🦁','🐻','🦊','🐯','🤠','😎','🧙','🤡','👾'];
+
+  // ─── PERSISTENCIA ──────────────────────────────────────────
+  function guardarLocal() {
+    localStorage.setItem('cacup_v2', JSON.stringify({ misLigas, ligaActualIdx }));
+  }
+  function cargarLocal() {
+    try {
+      const raw = localStorage.getItem('cacup_v2');
+      if (!raw) return false;
+      const d = JSON.parse(raw);
+      misLigas = d.misLigas || [];
+      ligaActualIdx = d.ligaActualIdx || 0;
+      return misLigas.length > 0;
+    } catch { return false; }
   }
 
   // ─── CREAR LIGA ────────────────────────────────────────────
@@ -454,140 +338,141 @@
     const jugadorNombre = document.getElementById('crear-jugador-nombre').value.trim();
     const dias = parseInt(document.getElementById('liga-duracion').value);
     const errEl = document.getElementById('crear-error');
-
-    if (!nombre || !jugadorNombre) {
-      errEl.textContent = 'Rellena todos los campos';
-      errEl.style.display = 'block';
-      return;
-    }
+    if (!nombre || !jugadorNombre) { errEl.textContent='Rellena todos los campos'; errEl.style.display='block'; return; }
     errEl.style.display = 'none';
 
     const codigo = generarCodigo();
     const fechaFin = new Date();
     fechaFin.setDate(fechaFin.getDate() + dias);
 
-    const { data: liga, error: ligaErr } = await sb
-      .from('ligas')
-      .insert({ nombre, codigo, duracion: `${dias}d`, fecha_fin: fechaFin.toISOString() })
-      .select().single();
+    const { data: liga, error: le } = await sb.from('ligas').insert({ nombre, codigo, duracion:`${dias}d`, fecha_fin:fechaFin.toISOString() }).select().single();
+    if (le) { errEl.textContent='Error al crear la liga.'; errEl.style.display='block'; return; }
 
-    if (ligaErr) { errEl.textContent = 'Error al crear la liga. Inténtalo de nuevo.'; errEl.style.display = 'block'; return; }
+    const emoji = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    const { data: jugador, error: je } = await sb.from('jugadores').insert({ liga_id:liga.id, nombre:jugadorNombre, emoji }).select().single();
+    if (je) { errEl.textContent='Error al crear el jugador.'; errEl.style.display='block'; return; }
 
-    const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-    const { data: jugador, error: jugErr } = await sb
-      .from('jugadores')
-      .insert({ liga_id: liga.id, nombre: jugadorNombre, emoji })
-      .select().single();
+    misLigas.push({ ligaId:liga.id, ligaCodigo:codigo, ligaNombre:nombre, ligaFechaFin:fechaFin.toISOString(), jugadorId:jugador.id, jugadorNombre });
+    ligaActualIdx = misLigas.length - 1;
+    guardarLocal();
 
-    if (jugErr) { errEl.textContent = 'Error al crear el jugador.'; errEl.style.display = 'block'; return; }
-
-    estado.ligaId = liga.id;
-    estado.ligaCodigo = codigo;
-    estado.ligaNombre = nombre;
-    estado.ligaFechaFin = fechaFin;
-    estado.jugadorId = jugador.id;
-    estado.jugadorNombre = jugadorNombre;
-
-    guardarEstadoLocal();
-
-    const link = `${window.location.origin}${window.location.pathname}?liga=${codigo}`;
+    const link = getLink();
     document.getElementById('invite-liga-nombre').textContent = nombre;
     document.getElementById('invite-link-text').textContent = link;
-
     showScreen('screen-invitacion');
   }
 
-  // ─── UNIRSE A LIGA ─────────────────────────────────────────
+  // ─── UNIRSE ────────────────────────────────────────────────
   async function unirseALiga() {
     const codigo = document.getElementById('unirse-codigo').value.trim().toUpperCase();
     const nombre = document.getElementById('unirse-nombre').value.trim();
     const errEl = document.getElementById('unirse-error');
-
-    if (!codigo || !nombre) {
-      errEl.textContent = 'Rellena todos los campos';
-      errEl.style.display = 'block';
-      return;
-    }
+    if (!codigo || !nombre) { errEl.textContent='Rellena todos los campos'; errEl.style.display='block'; return; }
     errEl.style.display = 'none';
 
+    // Comprobar si ya está en esta liga
+    const yaEnLiga = misLigas.find(l => l.ligaCodigo === codigo);
+    if (yaEnLiga) {
+      ligaActualIdx = misLigas.indexOf(yaEnLiga);
+      guardarLocal();
+      await cargarLiga();
+      showScreen('screen-liga');
+      return;
+    }
+
     const { data: liga, error } = await sb.from('ligas').select().eq('codigo', codigo).single();
-    if (error || !liga) { errEl.textContent = 'Liga no encontrada. Revisa el código.'; errEl.style.display = 'block'; return; }
+    if (error || !liga) { errEl.textContent='Liga no encontrada. Revisa el código.'; errEl.style.display='block'; return; }
+    if (!liga.activa) { errEl.textContent='Esta liga ya ha terminado.'; errEl.style.display='block'; return; }
 
-    if (!liga.activa) { errEl.textContent = 'Esta liga ya ha terminado.'; errEl.style.display = 'block'; return; }
+    const emoji = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    const { data: jugador, error: je } = await sb.from('jugadores').insert({ liga_id:liga.id, nombre, emoji }).select().single();
+    if (je) { errEl.textContent='Error al unirte.'; errEl.style.display='block'; return; }
 
-    const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-    const { data: jugador, error: jugErr } = await sb
-      .from('jugadores')
-      .insert({ liga_id: liga.id, nombre, emoji })
-      .select().single();
-
-    if (jugErr) { errEl.textContent = 'Error al unirte. Inténtalo de nuevo.'; errEl.style.display = 'block'; return; }
-
-    estado.ligaId = liga.id;
-    estado.ligaCodigo = codigo;
-    estado.ligaNombre = liga.nombre;
-    estado.ligaFechaFin = new Date(liga.fecha_fin);
-    estado.jugadorId = jugador.id;
-    estado.jugadorNombre = nombre;
-
-    guardarEstadoLocal();
+    misLigas.push({ ligaId:liga.id, ligaCodigo:codigo, ligaNombre:liga.nombre, ligaFechaFin:liga.fecha_fin, jugadorId:jugador.id, jugadorNombre:nombre });
+    ligaActualIdx = misLigas.length - 1;
+    guardarLocal();
     await cargarLiga();
     showScreen('screen-liga');
   }
 
-  // ─── ENTRAR A LIGA (desde invitación) ─────────────────────
-  async function entrarALiga() {
+  async function entrarALiga() { await cargarLiga(); showScreen('screen-liga'); }
+
+  // ─── MIS LIGAS PANEL ───────────────────────────────────────
+  async function verMisLigas() {
+    showScreen('screen-misligas');
+    const list = document.getElementById('misligas-list');
+    if (misLigas.length === 0) {
+      list.innerHTML = '<div class="ligas-empty">Aún no estás en ninguna liga.<br>¡Crea o únete a una!</div>';
+      return;
+    }
+
+    // Cargar stats de cada liga
+    const rows = await Promise.all(misLigas.map(async (l, i) => {
+      const { data: todos } = await sb.from('jugadores').select('id,total_cacas').eq('liga_id', l.ligaId).order('total_cacas', { ascending:false });
+      const pos = todos ? todos.findIndex(j => j.id === l.jugadorId) + 1 : '--';
+      const total = todos ? (todos.find(j => j.id === l.jugadorId)?.total_cacas || 0) : 0;
+      const fin = new Date(l.ligaFechaFin);
+      const dias = Math.max(0, Math.ceil((fin - new Date()) / 86400000));
+      const terminada = fin < new Date();
+      return { l, i, pos, total, dias, terminada };
+    }));
+
+    list.innerHTML = rows.map(({ l, i, pos, total, dias, terminada }) => `
+      <div class="liga-card ${i === ligaActualIdx ? 'activa' : ''}" onclick="cambiarALiga(${i})">
+        <div style="font-size:32px;">${terminada ? '🏁' : '⚽'}</div>
+        <div class="liga-card-info">
+          <div class="liga-card-nombre">${l.ligaNombre}</div>
+          <div class="liga-card-sub">${terminada ? 'Terminada' : `${dias}d restantes`} · ${total} 💩 · Pos #${pos}</div>
+        </div>
+        <div class="liga-card-pos">#${pos}</div>
+      </div>
+    `).join('');
+  }
+
+  async function cambiarALiga(idx) {
+    ligaActualIdx = idx;
+    guardarLocal();
+    if (realtimeSub) sb.removeChannel(realtimeSub);
+    if (timerInterval) clearInterval(timerInterval);
     await cargarLiga();
     showScreen('screen-liga');
   }
 
   // ─── CARGAR LIGA ───────────────────────────────────────────
   async function cargarLiga() {
-    document.getElementById('liga-nombre-display').textContent = estado.ligaNombre;
+    const l = ligaActual();
+    if (!l) return;
+    document.getElementById('liga-nombre-display').textContent = l.ligaNombre;
+    if (timerInterval) clearInterval(timerInterval);
     actualizarTimer();
-    setInterval(actualizarTimer, 60000);
+    timerInterval = setInterval(actualizarTimer, 60000);
     await cargarClasificacion();
     suscribirseRealtime();
   }
 
   function actualizarTimer() {
-    const fin = new Date(estado.ligaFechaFin);
-    const ahora = new Date();
-    const diff = fin - ahora;
-    if (diff <= 0) {
-      document.getElementById('liga-timer').textContent = '¡Liga terminada!';
-      mostrarFinal();
-      return;
-    }
-    const dias = Math.floor(diff / 86400000);
-    const horas = Math.floor((diff % 86400000) / 3600000);
-    const mins = Math.floor((diff % 3600000) / 60000);
-    let txt = '';
-    if (dias > 0) txt = `${dias}d ${horas}h restantes`;
-    else if (horas > 0) txt = `${horas}h ${mins}m restantes`;
-    else txt = `${mins} minutos restantes`;
-    document.getElementById('liga-timer').textContent = txt;
+    const l = ligaActual(); if (!l) return;
+    const fin = new Date(l.ligaFechaFin);
+    const diff = fin - new Date();
+    if (diff <= 0) { document.getElementById('liga-timer').textContent='¡Liga terminada!'; mostrarFinal(); return; }
+    const dias = Math.floor(diff/86400000);
+    const horas = Math.floor((diff%86400000)/3600000);
+    const mins = Math.floor((diff%3600000)/60000);
+    document.getElementById('liga-timer').textContent = dias > 0 ? `${dias}d ${horas}h restantes` : horas > 0 ? `${horas}h ${mins}m restantes` : `${mins} minutos restantes`;
   }
 
   async function cargarClasificacion() {
-    const { data, error } = await sb
-      .from('jugadores')
-      .select()
-      .eq('liga_id', estado.ligaId)
-      .order('total_cacas', { ascending: false });
-
-    if (error || !data) return;
-
-    const medals = ['🥇', '🥈', '🥉'];
-    const posColors = ['gold', 'silver', 'bronze'];
-    const list = document.getElementById('clasificacion-list');
-
-    list.innerHTML = data.map((j, i) => `
-      <div class="jugador-row ${j.id === estado.jugadorId ? 'me' : ''}">
-        <div class="jugador-pos ${posColors[i] || ''}">${medals[i] || (i + 1)}</div>
+    const l = ligaActual(); if (!l) return;
+    const { data } = await sb.from('jugadores').select().eq('liga_id', l.ligaId).order('total_cacas', { ascending:false });
+    if (!data) return;
+    const medals = ['🥇','🥈','🥉'];
+    const posColors = ['gold','silver','bronze'];
+    document.getElementById('clasificacion-list').innerHTML = data.map((j,i) => `
+      <div class="jugador-row ${j.id===l.jugadorId?'me':''}">
+        <div class="jugador-pos ${posColors[i]||''}">${medals[i]||(i+1)}</div>
         <div class="jugador-emoji">${j.emoji}</div>
         <div class="jugador-info">
-          <div class="jugador-nombre">${j.nombre}${j.id === estado.jugadorId ? ' (tú)' : ''}</div>
+          <div class="jugador-nombre">${j.nombre}${j.id===l.jugadorId?' (tú)':''}</div>
           <div class="jugador-sub">Racha: ${j.racha_actual} días 🔥</div>
         </div>
         <div class="jugador-count">${j.total_cacas}</div>
@@ -595,39 +480,23 @@
     `).join('');
   }
 
-  // ─── REALTIME ──────────────────────────────────────────────
   function suscribirseRealtime() {
-    if (estado.realtimeSub) sb.removeChannel(estado.realtimeSub);
-    estado.realtimeSub = sb.channel(`liga-${estado.ligaId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'jugadores', filter: `liga_id=eq.${estado.ligaId}` },
-        () => cargarClasificacion())
+    const l = ligaActual(); if (!l) return;
+    if (realtimeSub) sb.removeChannel(realtimeSub);
+    realtimeSub = sb.channel(`liga-${l.ligaId}`)
+      .on('postgres_changes', { event:'*', schema:'public', table:'jugadores', filter:`liga_id=eq.${l.ligaId}` }, () => cargarClasificacion())
       .subscribe();
   }
 
-  // ─── REGISTRAR CAGA ────────────────────────────────────────
+  // ─── REGISTRAR CAGA (en TODAS las ligas activas) ───────────
   const FRASES_CADENA = [
-    'Tirando de la cadena...',
-    '¡Qué a gusto me he quedado!',
-    'He soltado lastre 🎈',
-    'He sido papá 👶',
-    'Misión cumplida 🫡',
-    'El trono me llama menos...',
-    'Ligero como una pluma 🪶',
-    'El equipo ya puede respirar',
-    'Récord personal en camino 📈',
-    'La liga tiembla ante mí',
+    'Tirando de la cadena...','¡Qué a gusto me he quedado!','He soltado lastre 🎈',
+    'He sido papá 👶','Misión cumplida 🫡','El trono me llama menos...',
+    'Ligero como una pluma 🪶','El equipo ya puede respirar',
+    'Récord personal en camino 📈','La liga tiembla ante mí',
+    'Ha nacido una estrella ⭐','El momento más glorioso del día',
   ];
-
-  const FRASES_CONFIRMACION = [
-    '💩 ¡Anotado campeón!',
-    '💩 ¡Suma y sigue!',
-    '💩 ¡Eso es dedicación!',
-    '💩 ¡El trono es tuyo!',
-    '💩 ¡La liga te teme!',
-    '💩 ¡Imparable!',
-  ];
-
-  let cagandose = false;
+  const FRASES_CONF = ['💩 ¡Anotado campeón!','💩 ¡Suma y sigue!','💩 ¡Eso es dedicación!','💩 ¡El trono es tuyo!','💩 ¡La liga te teme!','💩 ¡Imparable!'];
 
   async function registrarCaga() {
     if (cagandose) return;
@@ -637,204 +506,125 @@
     btn.classList.add('shake');
     setTimeout(() => btn.classList.remove('shake'), 400);
 
-    // Registrar en BD inmediatamente
+    const frase = FRASES_CADENA[Math.floor(Math.random()*FRASES_CADENA.length)];
+    mostrarOverlay(frase);
+
+    // Registrar en TODAS las ligas activas del usuario
     const ahora = new Date();
-    const { error: cacaErr } = await sb.from('cacas').insert({
-      jugador_id: estado.jugadorId,
-      liga_id: estado.ligaId,
-      hora: ahora.toISOString()
-    });
-    if (cacaErr) { showToast('❌ Error al registrar'); cagandose = false; return; }
+    const ligasActivas = misLigas.filter(l => new Date(l.ligaFechaFin) > ahora);
 
-    const { data: jugador } = await sb.from('jugadores').select().eq('id', estado.jugadorId).single();
-    const nuevaUltima = jugador?.ultima_caga ? new Date(jugador.ultima_caga) : null;
-    const esMismoDia = nuevaUltima && nuevaUltima.toDateString() === ahora.toDateString();
-    const esConsecutivo = nuevaUltima && ((ahora - nuevaUltima) < 86400000 * 2);
-
-    await sb.from('jugadores').update({
-      total_cacas: (jugador?.total_cacas || 0) + 1,
-      ultima_caga: ahora.toISOString(),
-      racha_actual: esMismoDia ? (jugador?.racha_actual || 1) : (esConsecutivo ? (jugador?.racha_actual || 0) + 1 : 1)
-    }).eq('id', estado.jugadorId);
-
-    // Arrancar temporizador gracioso
-    const frase = FRASES_CADENA[Math.floor(Math.random() * FRASES_CADENA.length)];
-    iniciarCooldown(btn, frase);
+    await Promise.all(ligasActivas.map(async (l) => {
+      await sb.from('cacas').insert({ jugador_id:l.jugadorId, liga_id:l.ligaId, hora:ahora.toISOString() });
+      const { data: jugador } = await sb.from('jugadores').select().eq('id', l.jugadorId).single();
+      const nuevaUltima = jugador?.ultima_caga ? new Date(jugador.ultima_caga) : null;
+      const esMismoDia = nuevaUltima && nuevaUltima.toDateString()===ahora.toDateString();
+      const esConsec = nuevaUltima && ((ahora-nuevaUltima)<86400000*2);
+      await sb.from('jugadores').update({
+        total_cacas: (jugador?.total_cacas||0)+1,
+        ultima_caga: ahora.toISOString(),
+        racha_actual: esMismoDia ? (jugador?.racha_actual||1) : esConsec ? (jugador?.racha_actual||0)+1 : 1
+      }).eq('id', l.jugadorId);
+    }));
   }
 
-  function iniciarCooldown(btn, frase) {
-    btn.disabled = true;
-    btn.style.opacity = '0.6';
-    btn.style.cursor = 'not-allowed';
-
+  // ─── OVERLAY FRASE GRANDE ──────────────────────────────────
+  function mostrarOverlay(frase) {
+    const overlay = document.getElementById('frase-overlay');
+    const cuentaEl = document.getElementById('frase-cuenta');
+    const textoEl = document.getElementById('frase-texto');
+    textoEl.textContent = frase;
+    overlay.classList.add('show');
     let cuenta = 3;
+    cuentaEl.textContent = cuenta;
 
-    function tick() {
+    const interval = setInterval(() => {
+      cuenta--;
       if (cuenta > 0) {
-        btn.innerHTML = `
-          <span style="font-size:48px;">${cuenta}</span>
-          <span class="btn-cagar-label" style="font-size:11px; max-width:160px; text-align:center; line-height:1.3;">${frase}</span>
-        `;
-        cuenta--;
-        setTimeout(tick, 1000);
+        cuentaEl.textContent = cuenta;
       } else {
-        // Restaurar botón
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        btn.style.cursor = 'pointer';
-        btn.innerHTML = `💩<span class="btn-cagar-label">HE CAGADO</span>`;
+        clearInterval(interval);
+        overlay.classList.remove('show');
         cagandose = false;
-
-        const conf = FRASES_CONFIRMACION[Math.floor(Math.random() * FRASES_CONFIRMACION.length)];
+        const conf = FRASES_CONF[Math.floor(Math.random()*FRASES_CONF.length)];
         showToast(conf);
       }
-    }
-
-    tick();
+    }, 1000);
   }
 
   // ─── STATS ─────────────────────────────────────────────────
   async function showStats() {
     showScreen('screen-stats');
-    const { data: jugador } = await sb.from('jugadores').select().eq('id', estado.jugadorId).single();
-    const { data: cacas } = await sb.from('cacas').select().eq('jugador_id', estado.jugadorId);
-    const { data: todos } = await sb.from('jugadores').select().eq('liga_id', estado.ligaId);
-
-    if (!jugador || !cacas) return;
-
+    const l = ligaActual(); if (!l) return;
+    const { data: jugador } = await sb.from('jugadores').select().eq('id', l.jugadorId).single();
+    const { data: cacas } = await sb.from('cacas').select().eq('jugador_id', l.jugadorId);
+    const { data: todos } = await sb.from('jugadores').select().eq('liga_id', l.ligaId);
+    if (!jugador||!cacas) return;
     const horas = cacas.map(c => new Date(c.hora).getHours());
-    const frecHoras = {};
-    horas.forEach(h => frecHoras[h] = (frecHoras[h] || 0) + 1);
-    const horaPico = Object.keys(frecHoras).length > 0
-      ? Object.entries(frecHoras).sort((a,b) => b[1]-a[1])[0][0]
-      : '--';
-
+    const frecH = {}; horas.forEach(h => frecH[h]=(frecH[h]||0)+1);
+    const horaPico = Object.keys(frecH).length>0 ? Object.entries(frecH).sort((a,b)=>b[1]-a[1])[0][0] : '--';
     const dias = cacas.map(c => new Date(c.hora).toDateString());
-    const frecDias = {};
-    dias.forEach(d => frecDias[d] = (frecDias[d] || 0) + 1);
-    const mejorDia = Object.keys(frecDias).length > 0
-      ? Math.max(...Object.values(frecDias))
-      : 0;
-
-    const media = todos.length > 0 ? (todos.reduce((s,j) => s + j.total_cacas, 0) / todos.length).toFixed(1) : 0;
-    const tuPos = [...todos].sort((a,b) => b.total_cacas - a.total_cacas).findIndex(j => j.id === estado.jugadorId) + 1;
-
+    const frecD = {}; dias.forEach(d => frecD[d]=(frecD[d]||0)+1);
+    const mejorDia = Object.values(frecD).length>0 ? Math.max(...Object.values(frecD)) : 0;
+    const media = todos?.length>0 ? (todos.reduce((s,j)=>s+j.total_cacas,0)/todos.length).toFixed(1) : 0;
+    const tuPos = [...(todos||[])].sort((a,b)=>b.total_cacas-a.total_cacas).findIndex(j=>j.id===l.jugadorId)+1;
     document.getElementById('stats-grid').innerHTML = `
-      <div class="stat-card">
-        <div class="stat-label">Total cacas</div>
-        <div class="stat-value">${jugador.total_cacas}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Posición</div>
-        <div class="stat-value">#${tuPos}</div>
-        <div class="stat-sub">de ${todos.length} jugadores</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Racha actual</div>
-        <div class="stat-value">${jugador.racha_actual}</div>
-        <div class="stat-sub">días seguidos 🔥</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Hora pico</div>
-        <div class="stat-value">${horaPico !== '--' ? horaPico + 'h' : '--'}</div>
-        <div class="stat-sub">tu hora favorita</div>
-      </div>
-      <div class="stat-card full">
-        <div class="stat-label">Mejor día</div>
-        <div class="stat-value">${mejorDia}</div>
-        <div class="stat-sub">cacas en un solo día · Media de la liga: ${media}</div>
-      </div>
+      <div class="stat-card"><div class="stat-label">Total cacas</div><div class="stat-value">${jugador.total_cacas}</div></div>
+      <div class="stat-card"><div class="stat-label">Posición</div><div class="stat-value">#${tuPos}</div><div class="stat-sub">de ${todos?.length||0} jugadores</div></div>
+      <div class="stat-card"><div class="stat-label">Racha actual</div><div class="stat-value">${jugador.racha_actual}</div><div class="stat-sub">días seguidos 🔥</div></div>
+      <div class="stat-card"><div class="stat-label">Hora pico</div><div class="stat-value">${horaPico!='--'?horaPico+'h':'--'}</div><div class="stat-sub">tu hora favorita</div></div>
+      <div class="stat-card full"><div class="stat-label">Mejor día</div><div class="stat-value">${mejorDia}</div><div class="stat-sub">cacas en un día · Media liga: ${media}</div></div>
+      <div class="stat-card full"><div class="stat-label">Ligas activas</div><div class="stat-value">${misLigas.filter(l=>new Date(l.ligaFechaFin)>new Date()).length}</div><div class="stat-sub">estás compitiendo en todas a la vez</div></div>
     `;
   }
 
   // ─── FINAL ─────────────────────────────────────────────────
   async function mostrarFinal() {
-    const { data } = await sb.from('jugadores').select().eq('liga_id', estado.ligaId).order('total_cacas', { ascending: false });
-    if (!data || data.length === 0) return;
-
-    const medals = ['🥇', '🥈', '🥉'];
-    document.getElementById('final-liga-nombre').textContent = estado.ligaNombre;
-    document.getElementById('podio-list').innerHTML = data.slice(0, 3).map((j, i) => `
-      <div class="podio-item ${i === 0 ? 'primero' : ''}">
+    const l = ligaActual(); if (!l) return;
+    const { data } = await sb.from('jugadores').select().eq('liga_id', l.ligaId).order('total_cacas', { ascending:false });
+    if (!data||data.length===0) return;
+    const medals = ['🥇','🥈','🥉'];
+    document.getElementById('final-liga-nombre').textContent = l.ligaNombre;
+    document.getElementById('podio-list').innerHTML = data.slice(0,3).map((j,i)=>`
+      <div class="podio-item ${i===0?'primero':''}">
         <div class="podio-medal">${medals[i]}</div>
-        <div class="podio-info">
-          <div class="podio-nombre">${j.emoji} ${j.nombre}</div>
-        </div>
+        <div class="podio-info"><div class="podio-nombre">${j.emoji} ${j.nombre}</div></div>
         <div class="podio-cacas">${j.total_cacas} 💩</div>
-      </div>
-    `).join('');
-
-    const ultimo = data[data.length - 1];
+      </div>`).join('');
+    const ultimo = data[data.length-1];
     document.getElementById('shame-name').textContent = `${ultimo.emoji} ${ultimo.nombre} — ${ultimo.total_cacas} 💩`;
     showScreen('screen-final');
   }
 
   // ─── COMPARTIR ─────────────────────────────────────────────
   function getLink() {
-    return `${window.location.origin}${window.location.pathname}?liga=${estado.ligaCodigo}`;
+    const l = ligaActual(); if (!l) return '';
+    return `${window.location.origin}${window.location.pathname}?liga=${l.ligaCodigo}`;
   }
-
   function compartirLink() {
-    const link = getLink();
-    const msg = `💩 Te reto a la CaCup "${estado.ligaNombre}". ¿Tienes lo que hace falta? ${link}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    const l = ligaActual(); if (!l) return;
+    window.open(`https://wa.me/?text=${encodeURIComponent(`💩 Te reto a la CaCup "${l.ligaNombre}". ¿Tienes lo que hace falta? ${getLink()}`)}`, '_blank');
   }
-
-  function compartirLiga() {
-    compartirLink();
-  }
-
+  function compartirLiga() { compartirLink(); }
   async function copiarLink() {
-    const link = getLink();
-    try {
-      await navigator.clipboard.writeText(link);
-      showToast('✅ Link copiado');
-    } catch {
-      showToast('Link: ' + link);
-    }
-  }
-
-  // ─── PERSISTENCIA LOCAL ────────────────────────────────────
-  function guardarEstadoLocal() {
-    localStorage.setItem('cacup_estado', JSON.stringify({
-      ligaId: estado.ligaId,
-      ligaCodigo: estado.ligaCodigo,
-      ligaNombre: estado.ligaNombre,
-      ligaFechaFin: estado.ligaFechaFin,
-      jugadorId: estado.jugadorId,
-      jugadorNombre: estado.jugadorNombre,
-    }));
-  }
-
-  async function recuperarEstadoLocal() {
-    const raw = localStorage.getItem('cacup_estado');
-    if (!raw) return false;
-    try {
-      const saved = JSON.parse(raw);
-      Object.assign(estado, saved);
-      const fin = new Date(estado.ligaFechaFin);
-      if (fin < new Date()) {
-        await mostrarFinal();
-        return true;
-      }
-      await cargarLiga();
-      showScreen('screen-liga');
-      return true;
-    } catch { return false; }
+    try { await navigator.clipboard.writeText(getLink()); showToast('✅ Link copiado'); }
+    catch { showToast('Link: '+getLink()); }
   }
 
   // ─── INIT ─────────────────────────────────────────────────
   async function init() {
     const params = new URLSearchParams(window.location.search);
     const codigoUrl = params.get('liga');
-
     if (codigoUrl) {
       document.getElementById('unirse-codigo').value = codigoUrl.toUpperCase();
       showScreen('screen-unirse');
       return;
     }
-
-    await recuperarEstadoLocal();
+    if (cargarLocal() && misLigas.length>0) {
+      const l = ligaActual();
+      if (new Date(l.ligaFechaFin) < new Date()) { await mostrarFinal(); return; }
+      await cargarLiga();
+      showScreen('screen-liga');
+    }
   }
 
   init();
