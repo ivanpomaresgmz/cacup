@@ -109,8 +109,27 @@
     .frase-texto { font-family:'Bebas Neue',sans-serif; font-size:30px; color:#fff; text-align:center; letter-spacing:2px; line-height:1.3; max-width:300px; }
     .frase-poop { font-size:72px; }
     /* TOAST */
-    .toast { position:fixed; bottom:calc(var(--nav-h) + 16px); left:50%; transform:translateX(-50%) translateY(100px); background:var(--green); color:#000; font-weight:700; padding:12px 24px; border-radius:50px; font-size:15px; transition:transform 0.3s; z-index:999; white-space:nowrap; }
-    .toast.show { transform:translateX(-50%) translateY(0); }
+    .toast {
+      position:fixed;
+      bottom:calc(var(--nav-h) + 20px);
+      left:50%;
+      transform:translateX(-50%) translateY(200px);
+      background:var(--green);
+      color:#000;
+      font-weight:700;
+      padding:12px 24px;
+      border-radius:50px;
+      font-size:15px;
+      z-index:2000;
+      white-space:nowrap;
+      pointer-events:none;
+      opacity:0;
+      transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s ease;
+    }
+    .toast.show {
+      transform:translateX(-50%) translateY(0);
+      opacity:1;
+    }
     /* STATS */
     #screen-stats { gap:20px; padding-top:24px; }
     .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -488,14 +507,22 @@
 
   // ─── TOAST ─────────────────────────────────────────────────
   let toastTimer = null;
-  function showToast(msg,dur=2500) {
-    const t=document.getElementById('toast');
-    t.textContent=msg;
+  function showToast(msg, dur=2500) {
+    const t = document.getElementById('toast');
+    // Limpiar timer anterior
+    if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
+    // Quitar clase, esperar un frame, volver a añadir
     t.classList.remove('show');
-    void t.offsetWidth; // forzar reflow para reiniciar animación
-    t.classList.add('show');
-    if(toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=>{ t.classList.remove('show'); toastTimer=null; }, dur);
+    t.textContent = msg;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        t.classList.add('show');
+        toastTimer = setTimeout(() => {
+          t.classList.remove('show');
+          toastTimer = null;
+        }, dur);
+      });
+    });
   }
 
   // ─── UTILS ─────────────────────────────────────────────────
