@@ -758,13 +758,34 @@
   async function init() {
     const params = new URLSearchParams(location.search);
     const codigoUrl = params.get('liga');
-    if (codigoUrl) { document.getElementById('unirse-codigo').value=codigoUrl.toUpperCase(); showScreen('screen-unirse'); return; }
-    if (cargarLocal() && misLigas.length>0) {
-      const l=ligaActual();
-      showNav();
-      if (new Date(l.ligaFechaFin)<new Date()) { await mostrarFinal(); return; }
-      await cargarLiga(); navTo('screen-liga');
+
+    // Siempre cargar estado local primero
+    cargarLocal();
+
+    // Si viene con código de invitación → pantalla unirse
+    if (codigoUrl) {
+      document.getElementById('unirse-codigo').value = codigoUrl.toUpperCase();
+      // Pre-rellenar nombre si ya tiene perfil
+      if (perfil.nombre) document.getElementById('unirse-nombre').value = perfil.nombre;
+      showScreen('screen-unirse');
+      return;
     }
+
+    // Si ya está en al menos una liga → entrar directo al dashboard
+    if (misLigas.length > 0) {
+      const l = ligaActual();
+      showNav();
+      if (new Date(l.ligaFechaFin) < new Date()) {
+        await mostrarFinal();
+        return;
+      }
+      await cargarLiga();
+      navTo('screen-liga');
+      return;
+    }
+
+    // Usuario nuevo → landing
+    showScreen('screen-landing');
   }
 
   init();
