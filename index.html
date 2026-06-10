@@ -16,12 +16,12 @@
     * { box-sizing:border-box; margin:0; padding:0; }
     body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; }
     h1,h2,h3 { font-family:'Bebas Neue',sans-serif; letter-spacing:2px; }
+    /* Base: todas las pantallas ocultas */
     .screen { display:none; width:100%; max-width:480px; flex-direction:column; position:relative; }
-    .screen.active { display:flex; }
-    /* Pantallas con nav: padding bottom para que el nav no tape el contenido */
-    .screen-with-nav { min-height:100vh; padding:24px 20px calc(var(--nav-h) + 16px); overflow-y:auto; }
-    /* Pantalla liga: altura exacta, sin overflow para botón fijo */
-    #screen-liga { height:100vh; padding:0; overflow:hidden; }
+    /* Pantallas normales con nav */
+    .screen.active { display:flex; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 16px); overflow-y:auto; }
+    /* Pantalla liga: layout fijo especial, SOLO cuando está activa */
+    #screen-liga.active { display:flex; min-height:unset; height:100vh; padding:0; overflow:hidden; }
     .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:#111; border-top:1px solid #222; display:flex; align-items:center; justify-content:space-around; z-index:500; max-width:480px; margin:0 auto; }
     .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border:none; background:none; color:var(--muted); transition:color 0.2s; flex:1; }
     .nav-item.active { color:var(--gold); }
@@ -219,7 +219,7 @@
 </div>
 
 <!-- ══ CREAR LIGA ══ -->
-<div class="screen screen-with-nav form-screen" id="screen-crear">
+<div class="screen form-screen" id="screen-crear">
   <button class="back-btn" onclick="goBack()">←</button>
   <div class="form-header"><h2>NUEVA LIGA</h2><p>Configura tu campeonato</p></div>
   <div class="field"><label>Nombre de la liga</label><input type="text" id="liga-nombre" placeholder="Ej: Los Cagones del Barrio" maxlength="40" /></div>
@@ -237,7 +237,7 @@
 </div>
 
 <!-- ══ INVITACIÓN ══ -->
-<div class="screen screen-with-nav form-screen" id="screen-invitacion">
+<div class="screen form-screen" id="screen-invitacion">
   <div class="form-header"><h2>¡LIGA CREADA!</h2><p>Comparte el link con tus amigos</p></div>
   <div class="invite-box">
     <div style="font-size:48px;">🏆</div>
@@ -250,7 +250,7 @@
 </div>
 
 <!-- ══ UNIRSE ══ -->
-<div class="screen screen-with-nav form-screen" id="screen-unirse">
+<div class="screen form-screen" id="screen-unirse">
   <button class="back-btn" onclick="goBack()">←</button>
   <div class="form-header"><h2>UNIRSE</h2><p>Entra a la liga de tus amigos</p></div>
   <div class="field"><label>Código de liga</label><input type="text" id="unirse-codigo" placeholder="Ej: ABC123" maxlength="8" style="text-transform:uppercase;letter-spacing:4px;font-family:Bebas Neue,sans-serif;font-size:28px;" /></div>
@@ -260,7 +260,7 @@
 </div>
 
 <!-- ══ MIS LIGAS ══ -->
-<div class="screen screen-with-nav" id="screen-misligas">
+<div class="screen" id="screen-misligas">
   <div class="form-header" style="margin-bottom:8px;"><h2>MIS LIGAS</h2><p>Toca una liga para verla</p></div>
   <div id="misligas-list"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
   <button class="btn btn-primary" onclick="showScreen('screen-crear')" style="margin-top:auto;">+ Crear nueva liga</button>
@@ -292,13 +292,13 @@
 </div>
 
 <!-- ══ STATS ══ -->
-<div class="screen screen-with-nav" id="screen-stats">
+<div class="screen" id="screen-stats">
   <div class="form-header"><h2>MIS STATS</h2></div>
   <div class="stats-grid" id="stats-grid"><div class="loading"><div class="spinner"></div></div></div>
 </div>
 
 <!-- ══ PERFIL ══ -->
-<div class="screen screen-with-nav" id="screen-perfil">
+<div class="screen" id="screen-perfil">
   <div class="form-header"><h2>MI PERFIL</h2></div>
   <div class="perfil-avatar">
     <div class="perfil-emoji-big" id="perfil-emoji-display" onclick="toggleEmojiPicker()">💩</div>
@@ -325,7 +325,7 @@
 </div>
 
 <!-- ══ FINAL ══ -->
-<div class="screen screen-with-nav" id="screen-final">
+<div class="screen" id="screen-final">
   <div class="form-header"><h2>🏁 FIN DE LA LIGA</h2><p id="final-liga-nombre"></p></div>
   <div class="podio" id="podio-list"></div>
   <div class="shame-box">
