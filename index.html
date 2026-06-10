@@ -78,9 +78,16 @@
     .ligas-empty { text-align:center; color:var(--muted); padding:40px 0; font-size:14px; }
     /* LIGA */
     #screen-liga { gap:0; padding:0; display:flex; flex-direction:column; overflow:hidden; }
-    .liga-header { text-align:center; padding:16px; background:var(--surface); border-radius:var(--radius); margin:16px 20px 12px; flex-shrink:0; }
-    .liga-nombre { font-size:28px; color:var(--gold); font-family:'Bebas Neue',sans-serif; letter-spacing:2px; }
-    .liga-timer { font-size:13px; color:var(--muted); margin-top:4px; }
+    .liga-header { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--surface); border-radius:var(--radius); margin:16px 20px 12px; flex-shrink:0; }
+    .liga-header-emoji { font-size:36px; cursor:pointer; flex-shrink:0; transition:transform 0.15s; }
+    .liga-header-emoji:active { transform:scale(0.88); }
+    .liga-header-center { flex:1; text-align:center; min-width:0; }
+    .liga-nombre { font-size:24px; color:var(--gold); font-family:'Bebas Neue',sans-serif; letter-spacing:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .liga-timer { font-size:12px; color:var(--muted); margin-top:2px; }
+    .liga-share-btn { flex-shrink:0; background:var(--surface2); border:1px solid #333; border-radius:10px; color:var(--text); font-size:20px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.15s; }
+    .liga-share-btn:active { background:#333; }
+    /* EMOJI PICKER LIGA */
+    .liga-emoji-picker { display:none; grid-template-columns:repeat(6,1fr); gap:8px; background:var(--surface); border-radius:var(--radius); padding:16px; margin:0 20px 8px; flex-shrink:0; }
     .clasificacion { display:flex; flex-direction:column; gap:8px; flex:1; overflow-y:auto; padding:0 20px 8px; min-height:0; }
     .clasificacion-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--muted); letter-spacing:2px; flex-shrink:0; }
     .jugador-row { display:flex; align-items:center; gap:12px; background:var(--surface); border-radius:14px; padding:14px 16px; flex-shrink:0; }
@@ -268,9 +275,15 @@
 <!-- ══ SALA LIGA ══ -->
 <div class="screen" id="screen-liga">
   <div class="liga-header">
-    <div class="liga-nombre" id="liga-nombre-display"></div>
-    <div class="liga-timer" id="liga-timer"></div>
+    <div class="liga-header-emoji" id="liga-emoji-display" onclick="toggleLigaEmojiPicker()">🏆</div>
+    <div class="liga-header-center">
+      <div class="liga-nombre" id="liga-nombre-display"></div>
+      <div class="liga-timer" id="liga-timer"></div>
+    </div>
+    <button class="liga-share-btn" onclick="compartirLigaActual()" title="Invitar amigos">📤</button>
   </div>
+  <!-- Picker emoji de liga -->
+  <div class="liga-emoji-picker" id="liga-emoji-picker"></div>
   <div class="clasificacion">
     <div class="clasificacion-title">Clasificación</div>
     <div id="clasificacion-list"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
@@ -444,6 +457,7 @@
       ligaCodigo: j.ligas.codigo,
       ligaNombre: j.ligas.nombre,
       ligaFechaFin: j.ligas.fecha_fin,
+      ligaEmoji: j.ligas.emoji || '🏆',
       jugadorId: j.id,
       jugadorNombre: j.nombre
     }));
@@ -614,7 +628,7 @@
     const {data:jugador,error:je}=await sb.from('jugadores').insert({liga_id:liga.id,nombre:jugadorNombre,emoji:usuario.emoji||'💩',usuario_id:usuario.id}).select().single();
     if(je){errEl.textContent='Error al crear el jugador.';errEl.style.display='block';return;}
 
-    misLigas.push({ligaId:liga.id,ligaCodigo:codigo,ligaNombre:nombre,ligaFechaFin:fechaFin.toISOString(),jugadorId:jugador.id,jugadorNombre});
+    misLigas.push({ligaId:liga.id,ligaCodigo:codigo,ligaNombre:nombre,ligaFechaFin:fechaFin.toISOString(),ligaEmoji:'🏆',jugadorId:jugador.id,jugadorNombre});
     ligaActualIdx=misLigas.length-1;
 
     document.getElementById('invite-liga-nombre').textContent=nombre;
@@ -640,7 +654,7 @@
     const {data:jugador,error:je}=await sb.from('jugadores').insert({liga_id:liga.id,nombre,emoji:usuario.emoji||'💩',usuario_id:usuario.id}).select().single();
     if(je){errEl.textContent='Error al unirte.';errEl.style.display='block';return;}
 
-    misLigas.push({ligaId:liga.id,ligaCodigo:codigo,ligaNombre:liga.nombre,ligaFechaFin:liga.fecha_fin,jugadorId:jugador.id,jugadorNombre:nombre});
+    misLigas.push({ligaId:liga.id,ligaCodigo:codigo,ligaNombre:liga.nombre,ligaFechaFin:liga.fecha_fin,ligaEmoji:liga.emoji||'🏆',jugadorId:jugador.id,jugadorNombre:nombre});
     ligaActualIdx=misLigas.length-1;
     await cargarLiga(); navTo('screen-liga');
   }
@@ -677,10 +691,49 @@
     await cargarLiga(); navTo('screen-liga');
   }
 
+  // ─── EMOJI LIGA ────────────────────────────────────────────
+  const EMOJIS_LIGA = ['🏆','⚽','🎯','💀','🔥','👑','💩','🎪','🤡','🥊','🐉','🦁','🐻','🌋','💣','⚡','🎲','🎭','🏴‍☠️','🤖','👻','🎃','🥷','🦄'];
+
+  function toggleLigaEmojiPicker() {
+    const picker = document.getElementById('liga-emoji-picker');
+    if (picker.style.display === 'grid') {
+      picker.style.display = 'none';
+      return;
+    }
+    const l = ligaActual(); if (!l) return;
+    picker.innerHTML = EMOJIS_LIGA.map(e => `
+      <div class="emoji-opt ${e===(l.ligaEmoji||'🏆')?'selected':''}"
+           onclick="seleccionarEmojiLiga('${e}')">${e}</div>
+    `).join('');
+    picker.style.display = 'grid';
+  }
+
+  async function seleccionarEmojiLiga(e) {
+    const l = ligaActual(); if (!l) return;
+    l.ligaEmoji = e;
+    document.getElementById('liga-emoji-display').textContent = e;
+    document.getElementById('liga-emoji-picker').style.display = 'none';
+    // Guardar en BD
+    await sb.from('ligas').update({ emoji: e }).eq('id', l.ligaId);
+    showToast('✅ Emoji guardado');
+  }
+
+  function compartirLigaActual() {
+    const l = ligaActual(); if (!l) return;
+    const msg = `💩 Te reto a la CaCup "${l.ligaEmoji||'🏆'} ${l.ligaNombre}". ¿Tienes lo que hace falta?\n\n${getLink()}`;
+    if (navigator.share) {
+      navigator.share({ title: 'CaCup', text: msg }).catch(()=>{});
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+  }
+
   // ─── CARGAR LIGA ───────────────────────────────────────────
   async function cargarLiga() {
     const l=ligaActual(); if(!l) return;
     document.getElementById('liga-nombre-display').textContent=l.ligaNombre;
+    document.getElementById('liga-emoji-display').textContent=l.ligaEmoji||'🏆';
+    document.getElementById('liga-emoji-picker').style.display='none';
     if(timerInterval)clearInterval(timerInterval);
     actualizarTimer(); timerInterval=setInterval(actualizarTimer,60000);
     await cargarClasificacion(); suscribirseRealtime();
