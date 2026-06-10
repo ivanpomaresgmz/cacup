@@ -879,6 +879,33 @@
   }
 
   init();
+
+  // ─── SERVICE WORKER + AUTO-UPDATE ─────────────────────────
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      // Comprobar actualizaciones cada vez que se abre la app
+      reg.update();
+
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Hay nueva versión disponible → recargar automáticamente
+            newWorker.postMessage('skipWaiting');
+          }
+        });
+      });
+    });
+
+    // Cuando el SW toma el control, recargar la página
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
+  }
 </script>
 </body>
 </html>
