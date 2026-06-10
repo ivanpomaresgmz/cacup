@@ -398,22 +398,107 @@
 
   function ligaActual() { return misLigas[ligaActualIdx] || null; }
 
-  // ─── SONIDO (Web Audio API) ────────────────────────────────
+  // ─── SONIDOS DE PEDO (Web Audio API) ──────────────────────
   function reproducirSonido() {
     if (!perfil.sonido) return;
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      // Sonido gracioso tipo "plop"
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(200, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.3);
-      gain.gain.setValueAtTime(0.5, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-      osc.start(); osc.stop(ctx.currentTime + 0.4);
-    } catch(e) {}
+    const tipos = [pedoCorto, pedoLargo, pedoTremulo, pedoMojado, pedoExplosivo];
+    const fn = tipos[Math.floor(Math.random() * tipos.length)];
+    try { fn(); } catch(e) {}
+  }
+
+  function getCtx() { return new (window.AudioContext || window.webkitAudioContext)(); }
+
+  // Pedo corto y seco
+  function pedoCorto() {
+    const ctx = getCtx();
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.3, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      const t = i / ctx.sampleRate;
+      const env = Math.exp(-t * 18);
+      data[i] = (Math.random() * 2 - 1) * env * Math.sin(2 * Math.PI * (80 + 40 * Math.exp(-t*10)) * t);
+    }
+    const src = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    src.buffer = buf; gain.gain.value = 1.2;
+    src.connect(gain); gain.connect(ctx.destination);
+    src.start();
+  }
+
+  // Pedo largo y resonante
+  function pedoLargo() {
+    const ctx = getCtx();
+    const dur = 0.7 + Math.random() * 0.4;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      const t = i / ctx.sampleRate;
+      const env = Math.pow(1 - t/dur, 1.5) * (t < 0.05 ? t/0.05 : 1);
+      const freq = 60 + 30 * Math.sin(t * 8) + 20 * Math.sin(t * 13);
+      data[i] = (Math.random() * 2 - 1) * 0.4 * env + Math.sin(2*Math.PI*freq*t) * 0.6 * env;
+    }
+    const src = ctx.createBufferSource();
+    const gain = ctx.createGain(); gain.gain.value = 1.0;
+    src.buffer = buf; src.connect(gain); gain.connect(ctx.destination); src.start();
+  }
+
+  // Pedo trémulo (vibrado)
+  function pedoTremulo() {
+    const ctx = getCtx();
+    const dur = 0.5 + Math.random() * 0.3;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      const t = i / ctx.sampleRate;
+      const env = Math.exp(-t * 4) * (t < 0.02 ? t/0.02 : 1);
+      const tremolo = 0.5 + 0.5 * Math.sin(2 * Math.PI * 22 * t);
+      const freq = 90 + 20 * Math.sin(t * 6);
+      data[i] = (Math.sin(2*Math.PI*freq*t) * 0.7 + (Math.random()*2-1) * 0.3) * env * tremolo;
+    }
+    const src = ctx.createBufferSource();
+    const gain = ctx.createGain(); gain.gain.value = 1.1;
+    src.buffer = buf; src.connect(gain); gain.connect(ctx.destination); src.start();
+  }
+
+  // Pedo mojado
+  function pedoMojado() {
+    const ctx = getCtx();
+    const dur = 0.4;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      const t = i / ctx.sampleRate;
+      const env = Math.exp(-t * 12) * (t < 0.01 ? t/0.01 : 1);
+      const burb = Math.sin(2*Math.PI*(100+200*Math.exp(-t*15))*t);
+      data[i] = ((Math.random()*2-1)*0.5 + burb*0.5) * env;
+    }
+    // Añadir burbujitas finales
+    for (let b = 0; b < 3; b++) {
+      const offset = Math.floor((0.1 + b*0.08) * ctx.sampleRate);
+      for (let i = 0; i < ctx.sampleRate * 0.06 && offset+i < data.length; i++) {
+        const t = i / ctx.sampleRate;
+        data[offset+i] += Math.sin(2*Math.PI*200*t) * Math.exp(-t*30) * 0.4;
+      }
+    }
+    const src = ctx.createBufferSource();
+    const gain = ctx.createGain(); gain.gain.value = 1.3;
+    src.buffer = buf; src.connect(gain); gain.connect(ctx.destination); src.start();
+  }
+
+  // Pedo explosivo
+  function pedoExplosivo() {
+    const ctx = getCtx();
+    const dur = 0.25;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      const t = i / ctx.sampleRate;
+      const env = Math.exp(-t * 25);
+      data[i] = (Math.random()*2-1) * env * 1.5 + Math.sin(2*Math.PI*120*t) * env * 0.8;
+    }
+    const src = ctx.createBufferSource();
+    const gain = ctx.createGain(); gain.gain.value = 1.4;
+    src.buffer = buf; src.connect(gain); gain.connect(ctx.destination); src.start();
   }
 
   function vibrar() {
