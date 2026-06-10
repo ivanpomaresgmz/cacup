@@ -16,8 +16,9 @@
     * { box-sizing:border-box; margin:0; padding:0; }
     body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding-bottom:var(--nav-h); }
     h1,h2,h3 { font-family:'Bebas Neue',sans-serif; letter-spacing:2px; }
-    .screen { display:none; width:100%; max-width:480px; padding:24px 20px 16px; min-height:calc(100vh - var(--nav-h)); flex-direction:column; position:relative; }
+    .screen { display:none; width:100%; max-width:480px; padding:24px 20px 16px; height:calc(100vh - var(--nav-h)); flex-direction:column; position:relative; overflow-y:auto; }
     .screen.active { display:flex; }
+    #screen-liga { overflow:hidden; padding:0; }
     .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:#111; border-top:1px solid #222; display:flex; align-items:center; justify-content:space-around; z-index:500; max-width:480px; margin:0 auto; }
     .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border:none; background:none; color:var(--muted); transition:color 0.2s; flex:1; }
     .nav-item.active { color:var(--gold); }
@@ -76,13 +77,13 @@
     .liga-card-pos { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); }
     .ligas-empty { text-align:center; color:var(--muted); padding:40px 0; font-size:14px; }
     /* LIGA */
-    #screen-liga { gap:16px; padding-top:20px; }
-    .liga-header { text-align:center; padding:16px; background:var(--surface); border-radius:var(--radius); }
+    #screen-liga { gap:0; padding:0; display:flex; flex-direction:column; overflow:hidden; }
+    .liga-header { text-align:center; padding:16px; background:var(--surface); border-radius:var(--radius); margin:16px 20px 12px; flex-shrink:0; }
     .liga-nombre { font-size:28px; color:var(--gold); font-family:'Bebas Neue',sans-serif; letter-spacing:2px; }
     .liga-timer { font-size:13px; color:var(--muted); margin-top:4px; }
-    .clasificacion { display:flex; flex-direction:column; gap:8px; }
-    .clasificacion-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--muted); letter-spacing:2px; }
-    .jugador-row { display:flex; align-items:center; gap:12px; background:var(--surface); border-radius:14px; padding:14px 16px; }
+    .clasificacion { display:flex; flex-direction:column; gap:8px; flex:1; overflow-y:auto; padding:0 20px 8px; min-height:0; }
+    .clasificacion-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--muted); letter-spacing:2px; flex-shrink:0; }
+    .jugador-row { display:flex; align-items:center; gap:12px; background:var(--surface); border-radius:14px; padding:14px 16px; flex-shrink:0; }
     .jugador-row.me { background:var(--surface2); border:1px solid var(--gold); }
     .jugador-pos { font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--muted); width:28px; text-align:center; }
     .jugador-pos.gold { color:var(--gold); }
@@ -93,8 +94,15 @@
     .jugador-nombre { font-weight:600; font-size:15px; }
     .jugador-sub { font-size:12px; color:var(--muted); margin-top:2px; }
     .jugador-count { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--gold); }
-    /* BOTÓN CAGAR */
-    .btn-cagar-wrap { display:flex; justify-content:center; padding:4px 0; }
+    /* BOTÓN CAGAR — siempre fijo encima del nav */
+    .btn-cagar-wrap {
+      flex-shrink:0;
+      display:flex;
+      justify-content:center;
+      padding:12px 0 16px;
+      background:var(--bg);
+      border-top:1px solid #1a1a1a;
+    }
     .btn-cagar { width:190px; height:190px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#8B4513,#5c2d0a); border:4px solid var(--gold); cursor:pointer; transition:transform 0.1s; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; padding:0; }
     .btn-cagar:active { transform:scale(0.93); }
     .btn-cagar-icon { font-size:96px; line-height:1; display:block; }
