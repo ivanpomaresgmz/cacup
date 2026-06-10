@@ -399,14 +399,28 @@
   function ligaActual() { return misLigas[ligaActualIdx] || null; }
 
   // ─── SONIDOS DE PEDO (Web Audio API) ──────────────────────
+  let audioCtx = null;
+
+  function getCtx() {
+    if (!audioCtx || audioCtx.state === 'closed') {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  // Desbloquear audio en cualquier toque del usuario
+  document.addEventListener('touchstart', () => {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }, false);
+
   function reproducirSonido() {
     if (!perfil.sonido) return;
     const tipos = [pedoCorto, pedoLargo, pedoTremulo, pedoMojado, pedoExplosivo];
     const fn = tipos[Math.floor(Math.random() * tipos.length)];
-    try { fn(); } catch(e) {}
+    try { fn(); } catch(e) { console.log('Audio error:', e); }
   }
-
-  function getCtx() { return new (window.AudioContext || window.webkitAudioContext)(); }
 
   // Pedo corto y seco
   function pedoCorto() {
@@ -503,7 +517,9 @@
 
   function vibrar() {
     if (!perfil.vibracion) return;
-    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+    try {
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+    } catch(e) {}
   }
 
   // ─── NAVEGACIÓN ────────────────────────────────────────────
