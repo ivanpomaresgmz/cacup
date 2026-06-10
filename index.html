@@ -14,12 +14,14 @@
       --danger:#e84040; --green:#3ecf8e; --radius:16px; --nav-h:68px;
     }
     * { box-sizing:border-box; margin:0; padding:0; }
-    body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding-bottom:var(--nav-h); }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; }
     h1,h2,h3 { font-family:'Bebas Neue',sans-serif; letter-spacing:2px; }
-    .screen { display:none; width:100%; max-width:480px; padding:24px 20px 16px; min-height:calc(100vh - var(--nav-h)); flex-direction:column; position:relative; overflow-y:auto; }
+    .screen { display:none; width:100%; max-width:480px; flex-direction:column; position:relative; }
     .screen.active { display:flex; }
-    /* Liga necesita altura exacta para que el botón quede fijo */
-    #screen-liga.active { display:flex; overflow:hidden; padding:0; height:calc(100vh - var(--nav-h)); min-height:unset; }
+    /* Pantallas con nav: padding bottom para que el nav no tape el contenido */
+    .screen-with-nav { min-height:100vh; padding:24px 20px calc(var(--nav-h) + 16px); overflow-y:auto; }
+    /* Pantalla liga: altura exacta, sin overflow para botón fijo */
+    #screen-liga { height:100vh; padding:0; overflow:hidden; }
     .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:#111; border-top:1px solid #222; display:flex; align-items:center; justify-content:space-around; z-index:500; max-width:480px; margin:0 auto; }
     .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border:none; background:none; color:var(--muted); transition:color 0.2s; flex:1; }
     .nav-item.active { color:var(--gold); }
@@ -78,8 +80,8 @@
     .liga-card-pos { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); }
     .ligas-empty { text-align:center; color:var(--muted); padding:40px 0; font-size:14px; }
     /* LIGA */
-    #screen-liga { gap:0; padding:0; display:flex; flex-direction:column; overflow:hidden; }
-    .liga-header { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--surface); border-radius:var(--radius); margin:16px 20px 12px; flex-shrink:0; }
+    #screen-liga { gap:0; padding:0; display:flex; flex-direction:column; overflow:hidden; height:100vh; }
+    .liga-header { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--surface); border-radius:var(--radius); margin:12px 16px 8px; flex-shrink:0; }
     .liga-header-emoji { font-size:36px; cursor:pointer; flex-shrink:0; transition:transform 0.15s; }
     .liga-header-emoji:active { transform:scale(0.88); }
     .liga-header-center { flex:1; text-align:center; min-width:0; }
@@ -87,10 +89,9 @@
     .liga-timer { font-size:12px; color:var(--muted); margin-top:2px; }
     .liga-share-btn { flex-shrink:0; background:var(--surface2); border:1px solid #333; border-radius:10px; color:var(--text); font-size:20px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.15s; }
     .liga-share-btn:active { background:#333; }
-    /* EMOJI PICKER LIGA */
-    .liga-emoji-picker { display:none; grid-template-columns:repeat(6,1fr); gap:8px; background:var(--surface); border-radius:var(--radius); padding:16px; margin:0 20px 8px; flex-shrink:0; }
-    .clasificacion { display:flex; flex-direction:column; gap:8px; flex:1; overflow-y:auto; padding:0 20px 8px; min-height:0; }
-    .clasificacion-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--muted); letter-spacing:2px; flex-shrink:0; }
+    .liga-emoji-picker { display:none; grid-template-columns:repeat(6,1fr); gap:8px; background:var(--surface); border-radius:var(--radius); padding:16px; margin:0 16px 8px; flex-shrink:0; }
+    .clasificacion { display:flex; flex-direction:column; gap:8px; flex:1; overflow-y:auto; padding:0 16px 8px; min-height:0; }
+    .clasificacion-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--muted); letter-spacing:2px; flex-shrink:0; padding-top:4px; }
     .jugador-row { display:flex; align-items:center; gap:12px; background:var(--surface); border-radius:14px; padding:14px 16px; flex-shrink:0; }
     .jugador-row.me { background:var(--surface2); border:1px solid var(--gold); }
     .jugador-pos { font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--muted); width:28px; text-align:center; }
@@ -103,14 +104,7 @@
     .jugador-sub { font-size:12px; color:var(--muted); margin-top:2px; }
     .jugador-count { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--gold); }
     /* BOTÓN CAGAR — siempre fijo encima del nav */
-    .btn-cagar-wrap {
-      flex-shrink:0;
-      display:flex;
-      justify-content:center;
-      padding:12px 0 16px;
-      background:var(--bg);
-      border-top:1px solid #1a1a1a;
-    }
+    .btn-cagar-wrap { flex-shrink:0; display:flex; justify-content:center; padding:10px 0 calc(var(--nav-h) + 10px); background:var(--bg); border-top:1px solid #1a1a1a; }
     .btn-cagar { width:190px; height:190px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#8B4513,#5c2d0a); border:4px solid var(--gold); cursor:pointer; transition:transform 0.1s; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; padding:0; }
     .btn-cagar:active { transform:scale(0.93); }
     .btn-cagar-icon { font-size:96px; line-height:1; display:block; }
@@ -225,7 +219,7 @@
 </div>
 
 <!-- ══ CREAR LIGA ══ -->
-<div class="screen form-screen" id="screen-crear">
+<div class="screen screen-with-nav form-screen" id="screen-crear">
   <button class="back-btn" onclick="goBack()">←</button>
   <div class="form-header"><h2>NUEVA LIGA</h2><p>Configura tu campeonato</p></div>
   <div class="field"><label>Nombre de la liga</label><input type="text" id="liga-nombre" placeholder="Ej: Los Cagones del Barrio" maxlength="40" /></div>
@@ -243,7 +237,7 @@
 </div>
 
 <!-- ══ INVITACIÓN ══ -->
-<div class="screen form-screen" id="screen-invitacion">
+<div class="screen screen-with-nav form-screen" id="screen-invitacion">
   <div class="form-header"><h2>¡LIGA CREADA!</h2><p>Comparte el link con tus amigos</p></div>
   <div class="invite-box">
     <div style="font-size:48px;">🏆</div>
@@ -256,7 +250,7 @@
 </div>
 
 <!-- ══ UNIRSE ══ -->
-<div class="screen form-screen" id="screen-unirse">
+<div class="screen screen-with-nav form-screen" id="screen-unirse">
   <button class="back-btn" onclick="goBack()">←</button>
   <div class="form-header"><h2>UNIRSE</h2><p>Entra a la liga de tus amigos</p></div>
   <div class="field"><label>Código de liga</label><input type="text" id="unirse-codigo" placeholder="Ej: ABC123" maxlength="8" style="text-transform:uppercase;letter-spacing:4px;font-family:Bebas Neue,sans-serif;font-size:28px;" /></div>
@@ -266,7 +260,7 @@
 </div>
 
 <!-- ══ MIS LIGAS ══ -->
-<div class="screen" id="screen-misligas">
+<div class="screen screen-with-nav" id="screen-misligas">
   <div class="form-header" style="margin-bottom:8px;"><h2>MIS LIGAS</h2><p>Toca una liga para verla</p></div>
   <div id="misligas-list"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
   <button class="btn btn-primary" onclick="showScreen('screen-crear')" style="margin-top:auto;">+ Crear nueva liga</button>
@@ -298,13 +292,13 @@
 </div>
 
 <!-- ══ STATS ══ -->
-<div class="screen" id="screen-stats">
+<div class="screen screen-with-nav" id="screen-stats">
   <div class="form-header"><h2>MIS STATS</h2></div>
   <div class="stats-grid" id="stats-grid"><div class="loading"><div class="spinner"></div></div></div>
 </div>
 
 <!-- ══ PERFIL ══ -->
-<div class="screen" id="screen-perfil">
+<div class="screen screen-with-nav" id="screen-perfil">
   <div class="form-header"><h2>MI PERFIL</h2></div>
   <div class="perfil-avatar">
     <div class="perfil-emoji-big" id="perfil-emoji-display" onclick="toggleEmojiPicker()">💩</div>
@@ -331,7 +325,7 @@
 </div>
 
 <!-- ══ FINAL ══ -->
-<div class="screen" id="screen-final">
+<div class="screen screen-with-nav" id="screen-final">
   <div class="form-header"><h2>🏁 FIN DE LA LIGA</h2><p id="final-liga-nombre"></p></div>
   <div class="podio" id="podio-list"></div>
   <div class="shame-box">
