@@ -883,29 +883,84 @@
   // ─── SERVICE WORKER + AUTO-UPDATE ─────────────────────────
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').then(reg => {
-      // Comprobar actualizaciones cada vez que se abre la app
       reg.update();
-
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // Hay nueva versión disponible → recargar automáticamente
             newWorker.postMessage('skipWaiting');
           }
         });
       });
     });
-
-    // Cuando el SW toma el control, recargar la página
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!refreshing) {
-        refreshing = true;
-        window.location.reload();
-      }
+      if (!refreshing) { refreshing = true; window.location.reload(); }
     });
   }
+
+  // ─── PULL TO REFRESH ──────────────────────────────────────
+  let ptrStartY = 0;
+  let ptrDist = 0;
+  let ptrActive = false;
+  const PTR_THRESHOLD = 80;
+
+  const ptrEl = document.getElementById('ptr-indicator');
+
+  document.addEventListener('touchstart', e => {
+    // Solo activar si estamos en el top de la pantalla
+    const screen = document.querySelector('.screen.active');
+    if (!screen) return;
+    const scrollTop = screen.scrollTop || 0;
+    if (scrollTop > 0) return;
+    ptrStartY = e.touches[0].clientY;
+    ptrActive = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!ptrActive) return;
+    ptrDist = e.touches[0].clientY - ptrStartY;
+    if (ptrDist < 0) { ptrActive = false; return; }
+    const progress = Math.min(ptrDist / PTR_THRESHOLD, 1);
+    const pull = Math.min(ptrDist * 0.4, 60);
+    ptrEl.style.transform = `translateX(-50%) translateY(${pull - 48}px)`;
+    ptrEl.style.opacity = progress.toString();
+    if (ptrDist >= PTR_THRESHOLD) {
+      ptrEl.textContent = '↑ Suelta para actualizar';
+      ptrEl.style.background = 'var(--gold)';
+      ptrEl.style.color = '#000';
+    } else {
+      ptrEl.textContent = '↓ Desliza para actualizar';
+      ptrEl.style.background = 'var(--surface2)';
+      ptrEl.style.color = 'var(--text)';
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    if (!ptrActive) return;
+    ptrActive = false;
+    if (ptrDist >= PTR_THRESHOLD) {
+      ptrEl.textContent = '⟳ Actualizando...';
+      ptrEl.style.transform = 'translateX(-50%) translateY(12px)';
+      setTimeout(() => window.location.reload(), 500);
+    } else {
+      ptrEl.style.transform = 'translateX(-50%) translateY(-48px)';
+      ptrEl.style.opacity = '0';
+    }
+    ptrDist = 0;
+  });
 </script>
-</body>
+
+<!-- PTR INDICATOR -->
+<div id="ptr-indicator" style="
+  position:fixed; top:0; left:50%;
+  transform:translateX(-50%) translateY(-48px);
+  background:var(--surface2); color:var(--text);
+  padding:8px 20px; border-radius:0 0 20px 20px;
+  font-size:13px; font-weight:600;
+  z-index:9999; opacity:0;
+  transition:none;
+  pointer-events:none;
+  white-space:nowrap;
+">↓ Desliza para actualizar</div></body>
 </html>
