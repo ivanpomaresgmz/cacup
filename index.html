@@ -125,41 +125,64 @@
     .jugador-nombre { font-weight:600; font-size:15px; }
     .jugador-sub { font-size:12px; color:var(--muted); margin-top:2px; }
     .jugador-count { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--gold); }
-    /* BOTÓN CAGAR — siempre fijo encima del nav */
-    .btn-cagar-wrap { flex-shrink:0; display:flex; justify-content:center; padding:8px 0 12px; background:var(--bg); border-top:1px solid #1a1a1a; }
+    /* BOTÓN CAGAR — encima del nav, no debajo */
+    .btn-cagar-wrap {
+      flex-shrink:0; display:flex; justify-content:center;
+      padding:8px 0 12px; background:var(--bg);
+      border-top:1px solid #1a1a1a;
+    }
     .btn-cagar {
-      width:190px; height:190px; border-radius:50%;
+      width:160px; height:160px; border-radius:50%;
       background:radial-gradient(circle at 35% 35%,#8B4513,#5c2d0a);
       border:4px solid var(--gold);
       cursor:pointer;
-      transition:transform 0.1s;
-      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      transition:transform 0.15s ease;
+      box-shadow:0 6px 24px rgba(0,0,0,0.5);
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       position:relative; overflow:hidden; padding:0;
       -webkit-tap-highlight-color: transparent;
       user-select:none;
     }
+    .btn-cagar img.caca-static {
+      position:absolute; inset:0; width:100%; height:100%;
+      object-fit:cover; border-radius:50%;
+      pointer-events:none;
+    }
     .btn-cagar video {
-      width:100%; height:100%; object-fit:cover;
-      border-radius:50%;
+      position:absolute; inset:0; width:100%; height:100%;
+      object-fit:cover; border-radius:50%;
       pointer-events:none;
     }
     .btn-cagar-label {
-      position:absolute; bottom:10px;
-      font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2px; color:var(--gold);
-      text-shadow:0 1px 3px rgba(0,0,0,0.8);
+      position:absolute; bottom:8px;
+      font-family:'Bebas Neue',sans-serif; font-size:12px;
+      letter-spacing:2px; color:var(--gold);
+      text-shadow:0 1px 3px rgba(0,0,0,0.9);
+      z-index:2;
     }
-    /* Progress ring mientras se mantiene pulsado */
     .btn-cagar-progress {
-      position:absolute; inset:-4px;
-      border-radius:50%;
+      position:absolute; inset:-4px; border-radius:50%;
       background:conic-gradient(var(--gold) 0%, transparent 0%);
-      opacity:0;
-      transition:opacity 0.2s;
-      pointer-events:none;
+      opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:1;
     }
     .btn-cagar-progress.active { opacity:1; }
-    .btn-cagar.shake { animation:shake 0.4s; }
+    /* Animación vibración + crecimiento al mantener pulsado */
+    @keyframes holdShake {
+      0%   { transform: scale(1) rotate(0deg); }
+      10%  { transform: scale(1.02) rotate(-1deg); }
+      20%  { transform: scale(1.04) rotate(1deg); }
+      30%  { transform: scale(1.05) rotate(-1deg); }
+      40%  { transform: scale(1.07) rotate(1deg); }
+      50%  { transform: scale(1.08) rotate(-0.5deg); }
+      60%  { transform: scale(1.09) rotate(0.5deg); }
+      70%  { transform: scale(1.09) rotate(-0.5deg); }
+      80%  { transform: scale(1.10) rotate(0.5deg); }
+      90%  { transform: scale(1.10) rotate(-0.3deg); }
+      100% { transform: scale(1.10) rotate(0deg); }
+    }
+    .btn-cagar.holding {
+      animation: holdShake 3s ease-out forwards;
+    }
     @keyframes shake { 0%,100%{transform:translateX(0) scale(1)} 20%{transform:translateX(-6px) scale(1.05)} 40%{transform:translateX(6px) scale(1.05)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
     /* OVERLAY */
     .frase-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9000; gap:20px; padding:32px; opacity:0; pointer-events:none; transition:opacity 0.3s; }
@@ -315,11 +338,12 @@
   </div>
   <div class="btn-cagar-wrap">
     <button class="btn-cagar" id="btn-cagar"
-      ontouchstart="iniciarPresion(event)" ontouchend="cancelarPresion()"
+      ontouchstart="iniciarPresion(event)" ontouchend="cancelarPresion()" ontouchcancel="cancelarPresion()"
       onmousedown="iniciarPresion(event)" onmouseup="cancelarPresion()" onmouseleave="cancelarPresion()">
       <div class="btn-cagar-progress" id="btn-progress"></div>
-      <video id="vid-saludando" src="/videos/saludando.webm" muted playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"></video>
-      <video id="vid-cagando" src="/videos/cagando.webm" muted playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;display:none;"></video>
+      <img id="caca-static" class="caca-static" src="/videos/caca_estatica.png" alt="" />
+      <video id="vid-saludando" src="/videos/saludando.webm" muted playsinline preload="auto" style="display:none;"></video>
+      <video id="vid-cagando" src="/videos/cagando.webm" muted playsinline preload="auto" style="display:none;"></video>
       <span class="btn-cagar-label">HE CAGADO</span>
     </button>
   </div>
@@ -808,25 +832,34 @@
   const FRASES_CONF = ['💩 ¡Anotado campeón!','💩 ¡Suma y sigue!','💩 ¡Eso es dedicación!','💩 ¡El trono es tuyo!','💩 ¡La liga te teme!','💩 ¡Imparable!'];
 
   // ─── ANIMACIÓN BOTÓN ──────────────────────────────────────
-  const HOLD_DURATION = 3000; // 3 segundos
+  const HOLD_DURATION = 3000;
   let holdTimer = null;
   let holdInterval = null;
   let holdStart = null;
 
+  function mostrarEstatico() {
+    document.getElementById('caca-static').style.display = 'block';
+    document.getElementById('vid-saludando').style.display = 'none';
+    document.getElementById('vid-cagando').style.display = 'none';
+  }
+
   function iniciarAnimacionSaludando() {
-    const vid = document.getElementById('vid-saludando');
+    const btn = document.getElementById('btn-cagar');
+    btn.classList.remove('holding');
+    const stat = document.getElementById('caca-static');
+    const vidS = document.getElementById('vid-saludando');
     const vidC = document.getElementById('vid-cagando');
     vidC.style.display = 'none';
-    vid.style.display = 'block';
-    // Reproducir cada 10 segundos
-    if (window._saludandoInterval) clearInterval(window._saludandoInterval);
-    vid.currentTime = 0;
-    vid.play().catch(()=>{});
-    vid.onended = () => {
-      // Pausar en último frame hasta los 10s
-      window._saludandoInterval = setTimeout(() => {
-        vid.currentTime = 0;
-        vid.play().catch(()=>{});
+    stat.style.display = 'none';
+    vidS.style.display = 'block';
+    if (window._saludandoTimeout) clearTimeout(window._saludandoTimeout);
+    vidS.currentTime = 0;
+    vidS.play().catch(() => { stat.style.display='block'; vidS.style.display='none'; });
+    vidS.onended = () => {
+      // Pausa en último frame 10s luego vuelve
+      window._saludandoTimeout = setTimeout(() => {
+        vidS.currentTime = 0;
+        vidS.play().catch(() => {});
       }, 10000);
     };
   }
@@ -835,16 +868,22 @@
     e.preventDefault();
     if (cagandose) return;
 
+    const btn = document.getElementById('btn-cagar');
+    btn.classList.add('holding');
+
     // Cambiar a vídeo cagando
-    const vidS = document.getElementById('vid-saludando');
+    document.getElementById('caca-static').style.display = 'none';
+    document.getElementById('vid-saludando').style.display = 'none';
     const vidC = document.getElementById('vid-cagando');
-    vidS.style.display = 'none';
     vidC.style.display = 'block';
     vidC.currentTime = 0;
-    vidC.play().catch(()=>{});
+    vidC.play().catch(() => {});
 
-    // Vibración continua
-    if (navigator.vibrate) navigator.vibrate([100,50,100,50,100,50,100]);
+    // Sonido de pedo inmediato
+    reproducirSonido();
+
+    // Vibración
+    if (navigator.vibrate) navigator.vibrate([80, 40, 80, 40, 80]);
 
     // Anillo de progreso
     const progress = document.getElementById('btn-progress');
@@ -855,17 +894,18 @@
       const elapsed = Date.now() - holdStart;
       const pct = Math.min((elapsed / HOLD_DURATION) * 100, 100);
       progress.style.background = `conic-gradient(var(--gold) ${pct}%, transparent ${pct}%)`;
-      if (navigator.vibrate && elapsed % 500 < 50) navigator.vibrate(30);
-    }, 30);
+      if (navigator.vibrate) navigator.vibrate(20);
+    }, 100);
 
-    holdTimer = setTimeout(() => {
-      completarCaga();
-    }, HOLD_DURATION);
+    holdTimer = setTimeout(() => { completarCaga(); }, HOLD_DURATION);
   }
 
   function cancelarPresion() {
+    if (!holdTimer && !holdInterval) return;
     if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
     if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
+    const btn = document.getElementById('btn-cagar');
+    btn.classList.remove('holding');
     const progress = document.getElementById('btn-progress');
     progress.classList.remove('active');
     progress.style.background = 'conic-gradient(var(--gold) 0%, transparent 0%)';
@@ -1023,68 +1063,69 @@
   let ptrStartY = 0;
   let ptrDist = 0;
   let ptrActive = false;
-  const PTR_THRESHOLD = 75;
+  const PTR_THRESHOLD = 70;
   const ptrEl = document.getElementById('ptr-indicator');
 
-  function getActiveScreen() { return document.querySelector('.screen.active'); }
+  function hidePTR() {
+    ptrEl.style.transition = 'transform 0.2s, opacity 0.2s';
+    ptrEl.style.transform = 'translateX(-50%) translateY(-44px)';
+    ptrEl.style.opacity = '0';
+  }
 
-  document.addEventListener('touchstart', e => {
-    const screen = getActiveScreen();
-    if (!screen) return;
-    if (screen.scrollTop > 2) return;
-    ptrStartY = e.touches[0].clientY;
+  document.body.addEventListener('touchstart', e => {
+    const scr = document.querySelector('.screen.active');
+    if (!scr || scr.id === 'screen-auth') return;
+    if ((scr.scrollTop || 0) > 4) return;
+    ptrStartY = e.touches[0].pageY;
     ptrDist = 0;
     ptrActive = true;
-  }, { passive: true });
+  }, { passive: true, capture: false });
 
-  document.addEventListener('touchmove', e => {
+  document.body.addEventListener('touchmove', e => {
     if (!ptrActive) return;
-    const screen = getActiveScreen();
-    if (screen && screen.scrollTop > 2) { ptrActive = false; return; }
-    const dy = e.touches[0].clientY - ptrStartY;
-    if (dy <= 0) { ptrActive = false; ptrEl.style.opacity = '0'; return; }
+    const scr = document.querySelector('.screen.active');
+    if (scr && (scr.scrollTop || 0) > 4) { ptrActive = false; hidePTR(); return; }
+    const dy = e.touches[0].pageY - ptrStartY;
+    if (dy <= 0) { ptrActive = false; hidePTR(); return; }
     ptrDist = dy;
-    const pull = Math.min(dy * 0.45, 52);
+    const pull = Math.min(dy * 0.38, 48);
     ptrEl.style.transition = 'none';
+    ptrEl.style.opacity = Math.min(dy / PTR_THRESHOLD, 1).toFixed(2);
     ptrEl.style.transform = `translateX(-50%) translateY(${pull - 44}px)`;
-    ptrEl.style.opacity = Math.min(dy / PTR_THRESHOLD, 1).toString();
     if (dy >= PTR_THRESHOLD) {
       ptrEl.textContent = '↑ Suelta para actualizar';
       ptrEl.style.background = 'var(--gold)';
       ptrEl.style.color = '#000';
     } else {
       ptrEl.textContent = '↓ Desliza para actualizar';
-      ptrEl.style.background = 'var(--surface2)';
+      ptrEl.style.background = '#2a2a2a';
       ptrEl.style.color = 'var(--text)';
     }
-  }, { passive: true });
+  }, { passive: true, capture: false });
 
-  document.addEventListener('touchend', () => {
+  document.body.addEventListener('touchend', () => {
     if (!ptrActive) return;
     ptrActive = false;
     if (ptrDist >= PTR_THRESHOLD) {
       ptrEl.textContent = '⟳ Actualizando...';
-      ptrEl.style.transition = 'transform 0.25s';
+      ptrEl.style.transition = 'transform 0.2s';
       ptrEl.style.transform = 'translateX(-50%) translateY(8px)';
-      setTimeout(() => window.location.reload(), 500);
+      setTimeout(() => window.location.reload(), 400);
     } else {
-      ptrEl.style.transition = 'transform 0.25s, opacity 0.25s';
-      ptrEl.style.transform = 'translateX(-50%) translateY(-44px)';
-      ptrEl.style.opacity = '0';
+      hidePTR();
     }
     ptrDist = 0;
-  });
+  }, { capture: false });
 </script>
 
 <!-- PTR INDICATOR -->
 <div id="ptr-indicator" style="
   position:fixed; top:0; left:50%;
-  transform:translateX(-50%) translateY(-48px);
-  background:var(--surface2); color:var(--text);
+  transform:translateX(-50%) translateY(-44px);
+  background:#2a2a2a; color:var(--text);
   padding:8px 20px; border-radius:0 0 20px 20px;
   font-size:13px; font-weight:600;
   z-index:9999; opacity:0;
-  transition:none;
   pointer-events:none;
   white-space:nowrap;
 ">↓ Desliza para actualizar</div></body>
