@@ -11,7 +11,7 @@
     :root {
       --bg:#0f0f0f; --surface:#1a1a1a; --surface2:#242424;
       --gold:#f5c400; --text:#f0f0f0; --muted:#888;
-      --danger:#e84040; --green:#3ecf8e; --radius:16px; --nav-h:68px;
+      --danger:#e84040; --green:#3ecf8e; --radius:16px; --nav-h:80px;
     }
     * { box-sizing:border-box; margin:0; padding:0; }
     body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
@@ -126,11 +126,39 @@
     .jugador-sub { font-size:12px; color:var(--muted); margin-top:2px; }
     .jugador-count { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--gold); }
     /* BOTÓN CAGAR — siempre fijo encima del nav */
-    .btn-cagar-wrap { flex-shrink:0; display:flex; justify-content:center; padding:10px 0 calc(var(--nav-h) + 10px); background:var(--bg); border-top:1px solid #1a1a1a; }
-    .btn-cagar { width:190px; height:190px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#8B4513,#5c2d0a); border:4px solid var(--gold); cursor:pointer; transition:transform 0.1s; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; padding:0; }
-    .btn-cagar:active { transform:scale(0.93); }
-    .btn-cagar-icon { font-size:96px; line-height:1; display:block; }
-    .btn-cagar-label { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2px; color:var(--gold); margin-top:2px; }
+    .btn-cagar-wrap { flex-shrink:0; display:flex; justify-content:center; padding:8px 0 12px; background:var(--bg); border-top:1px solid #1a1a1a; }
+    .btn-cagar {
+      width:190px; height:190px; border-radius:50%;
+      background:radial-gradient(circle at 35% 35%,#8B4513,#5c2d0a);
+      border:4px solid var(--gold);
+      cursor:pointer;
+      transition:transform 0.1s;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      position:relative; overflow:hidden; padding:0;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+    }
+    .btn-cagar video {
+      width:100%; height:100%; object-fit:cover;
+      border-radius:50%;
+      pointer-events:none;
+    }
+    .btn-cagar-label {
+      position:absolute; bottom:10px;
+      font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2px; color:var(--gold);
+      text-shadow:0 1px 3px rgba(0,0,0,0.8);
+    }
+    /* Progress ring mientras se mantiene pulsado */
+    .btn-cagar-progress {
+      position:absolute; inset:-4px;
+      border-radius:50%;
+      background:conic-gradient(var(--gold) 0%, transparent 0%);
+      opacity:0;
+      transition:opacity 0.2s;
+      pointer-events:none;
+    }
+    .btn-cagar-progress.active { opacity:1; }
     .btn-cagar.shake { animation:shake 0.4s; }
     @keyframes shake { 0%,100%{transform:translateX(0) scale(1)} 20%{transform:translateX(-6px) scale(1.05)} 40%{transform:translateX(6px) scale(1.05)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
     /* OVERLAY */
@@ -181,10 +209,10 @@
 </head>
 <body>
 
-<!-- OVERLAY FRASE -->
+<!-- OVERLAY CELEBRACIÓN -->
 <div class="frase-overlay" id="frase-overlay">
-  <div class="frase-poop">💩</div>
-  <div class="frase-cuenta" id="frase-cuenta">3</div>
+  <video id="vid-celebracion" src="/videos/celebracion.webm" playsinline preload="auto"
+    style="width:280px;height:280px;object-fit:contain;"></video>
   <div class="frase-texto" id="frase-texto"></div>
 </div>
 
@@ -286,8 +314,12 @@
     <div id="clasificacion-list"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
   </div>
   <div class="btn-cagar-wrap">
-    <button class="btn-cagar" id="btn-cagar" onclick="registrarCaga()">
-      <span class="btn-cagar-icon">💩</span>
+    <button class="btn-cagar" id="btn-cagar"
+      ontouchstart="iniciarPresion(event)" ontouchend="cancelarPresion()"
+      onmousedown="iniciarPresion(event)" onmouseup="cancelarPresion()" onmouseleave="cancelarPresion()">
+      <div class="btn-cagar-progress" id="btn-progress"></div>
+      <video id="vid-saludando" src="/videos/saludando.webm" muted playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"></video>
+      <video id="vid-cagando" src="/videos/cagando.webm" muted playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;display:none;"></video>
       <span class="btn-cagar-label">HE CAGADO</span>
     </button>
   </div>
@@ -734,6 +766,8 @@
     if(timerInterval)clearInterval(timerInterval);
     actualizarTimer(); timerInterval=setInterval(actualizarTimer,60000);
     await cargarClasificacion(); suscribirseRealtime();
+    // Arrancar animación saludando
+    setTimeout(iniciarAnimacionSaludando, 300);
   }
 
   function actualizarTimer() {
@@ -769,41 +803,130 @@
       .subscribe();
   }
 
-  // ─── REGISTRAR CAGA ────────────────────────────────────────
-  const FRASES_CADENA=['Tirando de la cadena...','¡Qué a gusto me he quedado!','He soltado lastre 🎈','He sido papá 👶','Misión cumplida 🫡','El trono me llama menos...','Ligero como una pluma 🪶','El equipo ya puede respirar','Récord personal en camino 📈','La liga tiembla ante mí','Ha nacido una estrella ⭐','El momento más glorioso del día'];
-  const FRASES_CONF=['💩 ¡Anotado campeón!','💩 ¡Suma y sigue!','💩 ¡Eso es dedicación!','💩 ¡El trono es tuyo!','💩 ¡La liga te teme!','💩 ¡Imparable!'];
+  // ─── FRASES ────────────────────────────────────────────────
+  const FRASES_CADENA = ['Tirando de la cadena...','¡Qué a gusto me he quedado!','He soltado lastre 🎈','He sido papá 👶','Misión cumplida 🫡','El trono me llama menos...','Ligero como una pluma 🪶','El equipo ya puede respirar','Récord personal en camino 📈','La liga tiembla ante mí','Ha nacido una estrella ⭐','El momento más glorioso del día'];
+  const FRASES_CONF = ['💩 ¡Anotado campeón!','💩 ¡Suma y sigue!','💩 ¡Eso es dedicación!','💩 ¡El trono es tuyo!','💩 ¡La liga te teme!','💩 ¡Imparable!'];
 
-  async function registrarCaga() {
-    if(cagandose)return;
-    cagandose=true;
-    reproducirSonido(); vibrar();
-    const btn=document.getElementById('btn-cagar');
-    btn.classList.add('shake'); setTimeout(()=>btn.classList.remove('shake'),400);
-    const frase=FRASES_CADENA[Math.floor(Math.random()*FRASES_CADENA.length)];
-    if(!usuario?.discreto)mostrarOverlay(frase);
-    const ahora=new Date();
-    const ligasActivas=misLigas.filter(l=>new Date(l.ligaFechaFin)>ahora);
-    await Promise.all(ligasActivas.map(async(l)=>{
-      await sb.from('cacas').insert({jugador_id:l.jugadorId,liga_id:l.ligaId,hora:ahora.toISOString()});
-      const {data:jugador}=await sb.from('jugadores').select().eq('id',l.jugadorId).single();
-      const nuevaUltima=jugador?.ultima_caga?new Date(jugador.ultima_caga):null;
-      const esMismoDia=nuevaUltima&&nuevaUltima.toDateString()===ahora.toDateString();
-      const esConsec=nuevaUltima&&((ahora-nuevaUltima)<86400000*2);
-      await sb.from('jugadores').update({total_cacas:(jugador?.total_cacas||0)+1,ultima_caga:ahora.toISOString(),racha_actual:esMismoDia?(jugador?.racha_actual||1):esConsec?(jugador?.racha_actual||0)+1:1}).eq('id',l.jugadorId);
+  // ─── ANIMACIÓN BOTÓN ──────────────────────────────────────
+  const HOLD_DURATION = 3000; // 3 segundos
+  let holdTimer = null;
+  let holdInterval = null;
+  let holdStart = null;
+
+  function iniciarAnimacionSaludando() {
+    const vid = document.getElementById('vid-saludando');
+    const vidC = document.getElementById('vid-cagando');
+    vidC.style.display = 'none';
+    vid.style.display = 'block';
+    // Reproducir cada 10 segundos
+    if (window._saludandoInterval) clearInterval(window._saludandoInterval);
+    vid.currentTime = 0;
+    vid.play().catch(()=>{});
+    vid.onended = () => {
+      // Pausar en último frame hasta los 10s
+      window._saludandoInterval = setTimeout(() => {
+        vid.currentTime = 0;
+        vid.play().catch(()=>{});
+      }, 10000);
+    };
+  }
+
+  function iniciarPresion(e) {
+    e.preventDefault();
+    if (cagandose) return;
+
+    // Cambiar a vídeo cagando
+    const vidS = document.getElementById('vid-saludando');
+    const vidC = document.getElementById('vid-cagando');
+    vidS.style.display = 'none';
+    vidC.style.display = 'block';
+    vidC.currentTime = 0;
+    vidC.play().catch(()=>{});
+
+    // Vibración continua
+    if (navigator.vibrate) navigator.vibrate([100,50,100,50,100,50,100]);
+
+    // Anillo de progreso
+    const progress = document.getElementById('btn-progress');
+    progress.classList.add('active');
+    holdStart = Date.now();
+
+    holdInterval = setInterval(() => {
+      const elapsed = Date.now() - holdStart;
+      const pct = Math.min((elapsed / HOLD_DURATION) * 100, 100);
+      progress.style.background = `conic-gradient(var(--gold) ${pct}%, transparent ${pct}%)`;
+      if (navigator.vibrate && elapsed % 500 < 50) navigator.vibrate(30);
+    }, 30);
+
+    holdTimer = setTimeout(() => {
+      completarCaga();
+    }, HOLD_DURATION);
+  }
+
+  function cancelarPresion() {
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
+    const progress = document.getElementById('btn-progress');
+    progress.classList.remove('active');
+    progress.style.background = 'conic-gradient(var(--gold) 0%, transparent 0%)';
+    if (!cagandose) iniciarAnimacionSaludando();
+  }
+
+  async function completarCaga() {
+    if (cagandose) return;
+    cagandose = true;
+    if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
+
+    reproducirSonido();
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+    const frase = FRASES_CADENA[Math.floor(Math.random() * FRASES_CADENA.length)];
+    if (!usuario?.discreto) mostrarOverlay(frase);
+
+    // Registrar en BD
+    const ahora = new Date();
+    const ligasActivas = misLigas.filter(l => new Date(l.ligaFechaFin) > ahora);
+    await Promise.all(ligasActivas.map(async l => {
+      await sb.from('cacas').insert({ jugador_id:l.jugadorId, liga_id:l.ligaId, hora:ahora.toISOString() });
+      const { data:jugador } = await sb.from('jugadores').select().eq('id', l.jugadorId).single();
+      const nuevaUltima = jugador?.ultima_caga ? new Date(jugador.ultima_caga) : null;
+      const esMismoDia = nuevaUltima && nuevaUltima.toDateString() === ahora.toDateString();
+      const esConsec = nuevaUltima && ((ahora - nuevaUltima) < 86400000 * 2);
+      await sb.from('jugadores').update({
+        total_cacas: (jugador?.total_cacas || 0) + 1,
+        ultima_caga: ahora.toISOString(),
+        racha_actual: esMismoDia ? (jugador?.racha_actual || 1) : esConsec ? (jugador?.racha_actual || 0) + 1 : 1
+      }).eq('id', l.jugadorId);
     }));
-    if(usuario?.discreto){cagandose=false;showToast(FRASES_CONF[Math.floor(Math.random()*FRASES_CONF.length)]);}
+
+    if (usuario?.discreto) {
+      cagandose = false;
+      iniciarAnimacionSaludando();
+      showToast(FRASES_CONF[Math.floor(Math.random() * FRASES_CONF.length)]);
+    }
   }
 
   function mostrarOverlay(frase) {
-    const overlay=document.getElementById('frase-overlay');
-    const cuentaEl=document.getElementById('frase-cuenta');
-    document.getElementById('frase-texto').textContent=frase;
-    overlay.classList.add('show'); let cuenta=3; cuentaEl.textContent=cuenta;
-    const interval=setInterval(()=>{
-      cuenta--;
-      if(cuenta>0){cuentaEl.textContent=cuenta;}
-      else{clearInterval(interval);overlay.classList.remove('show');cagandose=false;showToast(FRASES_CONF[Math.floor(Math.random()*FRASES_CONF.length)]);}
-    },1000);
+    const overlay = document.getElementById('frase-overlay');
+    const vid = document.getElementById('vid-celebracion');
+    document.getElementById('frase-texto').textContent = frase;
+    overlay.classList.add('show');
+    vid.currentTime = 0;
+    vid.play().catch(() => {});
+    vid.onended = () => {
+      overlay.classList.remove('show');
+      cagandose = false;
+      iniciarAnimacionSaludando();
+      showToast(FRASES_CONF[Math.floor(Math.random() * FRASES_CONF.length)]);
+    };
+    // Fallback por si el vídeo no termina
+    setTimeout(() => {
+      if (overlay.classList.contains('show')) {
+        overlay.classList.remove('show');
+        cagandose = false;
+        iniciarAnimacionSaludando();
+      }
+    }, 25000);
   }
 
   // ─── STATS ─────────────────────────────────────────────────
