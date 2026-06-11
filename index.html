@@ -147,37 +147,33 @@
       position:absolute; inset:0; width:100%; height:100%;
       object-fit:cover; border-radius:50%;
       pointer-events:none;
+      display:block;
     }
     .btn-cagar video {
       position:absolute; inset:0; width:100%; height:100%;
       object-fit:cover; border-radius:50%;
       pointer-events:none;
+      display:none;
     }
-    .btn-cagar-label {
-      position:absolute; bottom:8px;
-      font-family:'Bebas Neue',sans-serif; font-size:12px;
-      letter-spacing:2px; color:var(--gold);
-      text-shadow:0 1px 3px rgba(0,0,0,0.9);
-      z-index:2;
-    }
+    .btn-cagar-label { display:none; }
     .btn-cagar-progress {
       position:absolute; inset:-4px; border-radius:50%;
       background:conic-gradient(var(--gold) 0%, transparent 0%);
       opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:1;
     }
     .btn-cagar-progress.active { opacity:1; }
-    /* Animación vibración + crecimiento al mantener pulsado */
+    /* Animación vibración + crecimiento al mantener pulsado — máximo 10% */
     @keyframes holdShake {
       0%   { transform: scale(1) rotate(0deg); }
-      10%  { transform: scale(1.02) rotate(-1deg); }
-      20%  { transform: scale(1.04) rotate(1deg); }
+      10%  { transform: scale(1.01) rotate(-1deg); }
+      20%  { transform: scale(1.03) rotate(1deg); }
       30%  { transform: scale(1.05) rotate(-1deg); }
-      40%  { transform: scale(1.07) rotate(1deg); }
-      50%  { transform: scale(1.08) rotate(-0.5deg); }
-      60%  { transform: scale(1.09) rotate(0.5deg); }
+      40%  { transform: scale(1.06) rotate(1deg); }
+      50%  { transform: scale(1.07) rotate(-0.5deg); }
+      60%  { transform: scale(1.08) rotate(0.5deg); }
       70%  { transform: scale(1.09) rotate(-0.5deg); }
-      80%  { transform: scale(1.10) rotate(0.5deg); }
-      90%  { transform: scale(1.10) rotate(-0.3deg); }
+      80%  { transform: scale(1.09) rotate(0.3deg); }
+      90%  { transform: scale(1.10) rotate(-0.2deg); }
       100% { transform: scale(1.10) rotate(0deg); }
     }
     .btn-cagar.holding {
@@ -185,8 +181,21 @@
     }
     @keyframes shake { 0%,100%{transform:translateX(0) scale(1)} 20%{transform:translateX(-6px) scale(1.05)} 40%{transform:translateX(6px) scale(1.05)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
     /* OVERLAY */
-    .frase-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9000; gap:20px; padding:32px; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .frase-overlay { 
+      position:fixed; inset:0; 
+      background:rgba(0,0,0,0.92); 
+      display:flex; flex-direction:column; align-items:center; justify-content:center; 
+      z-index:9000; gap:16px; padding:32px; 
+      opacity:0; pointer-events:none; transition:opacity 0.3s; 
+    }
     .frase-overlay.show { opacity:1; pointer-events:all; }
+    .frase-overlay video {
+      width:min(80vw, 320px);
+      height:min(80vw, 320px);
+      object-fit:contain;
+      border-radius:20px;
+      display:block;
+    }
     .frase-cuenta { font-family:'Bebas Neue',sans-serif; font-size:140px; color:var(--gold); line-height:1; animation:pulseCuenta 1s ease-in-out infinite; }
     @keyframes pulseCuenta { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
     .frase-texto { font-family:'Bebas Neue',sans-serif; font-size:30px; color:#fff; text-align:center; letter-spacing:2px; line-height:1.3; max-width:300px; }
@@ -234,8 +243,7 @@
 
 <!-- OVERLAY CELEBRACIÓN -->
 <div class="frase-overlay" id="frase-overlay">
-  <video id="vid-celebracion" src="/videos/celebracion.webm" playsinline preload="auto"
-    style="width:280px;height:280px;object-fit:contain;"></video>
+  <video id="vid-celebracion" src="/videos/celebracion.mp4" playsinline preload="auto"></video>
   <div class="frase-texto" id="frase-texto"></div>
 </div>
 
@@ -341,10 +349,9 @@
       ontouchstart="iniciarPresion(event)" ontouchend="cancelarPresion()" ontouchcancel="cancelarPresion()"
       onmousedown="iniciarPresion(event)" onmouseup="cancelarPresion()" onmouseleave="cancelarPresion()">
       <div class="btn-cagar-progress" id="btn-progress"></div>
-      <img id="caca-static" class="caca-static" src="/videos/caca_estatica.png" alt="" />
-      <video id="vid-saludando" src="/videos/saludando.webm" muted playsinline preload="auto" style="display:none;"></video>
-      <video id="vid-cagando" src="/videos/cagando.webm" muted playsinline preload="auto" style="display:none;"></video>
-      <span class="btn-cagar-label">HE CAGADO</span>
+      <img id="caca-static" class="caca-static" src="/videos/caca_estatica.png" alt="" style="display:block;" />
+      <video id="vid-saludando" src="/videos/saludando.webm" muted playsinline preload="auto"></video>
+      <video id="vid-cagando" src="/videos/cagando.webm" muted playsinline preload="auto"></video>
     </button>
   </div>
 </div>
@@ -846,20 +853,29 @@
   function iniciarAnimacionSaludando() {
     const btn = document.getElementById('btn-cagar');
     btn.classList.remove('holding');
+    btn.style.transform = '';
     const stat = document.getElementById('caca-static');
     const vidS = document.getElementById('vid-saludando');
     const vidC = document.getElementById('vid-cagando');
     vidC.style.display = 'none';
+    // Mostrar vídeo saludando
     stat.style.display = 'none';
     vidS.style.display = 'block';
     if (window._saludandoTimeout) clearTimeout(window._saludandoTimeout);
     vidS.currentTime = 0;
-    vidS.play().catch(() => { stat.style.display='block'; vidS.style.display='none'; });
+    const playPromise = vidS.play();
+    if (playPromise) {
+      playPromise.catch(() => {
+        // Si falla el vídeo, mostrar imagen estática
+        vidS.style.display = 'none';
+        stat.style.display = 'block';
+      });
+    }
     vidS.onended = () => {
-      // Pausa en último frame 10s luego vuelve
+      // Pausa 10s en último frame, luego vuelve a reproducir
       window._saludandoTimeout = setTimeout(() => {
         vidS.currentTime = 0;
-        vidS.play().catch(() => {});
+        vidS.play().catch(() => { mostrarEstatico(); });
       }, 10000);
     };
   }
@@ -874,16 +890,22 @@
     // Cambiar a vídeo cagando
     document.getElementById('caca-static').style.display = 'none';
     document.getElementById('vid-saludando').style.display = 'none';
+    if (window._saludandoTimeout) clearTimeout(window._saludandoTimeout);
     const vidC = document.getElementById('vid-cagando');
     vidC.style.display = 'block';
     vidC.currentTime = 0;
     vidC.play().catch(() => {});
 
-    // Sonido de pedo inmediato
+    // Sonido de pedo
     reproducirSonido();
 
-    // Vibración
-    if (navigator.vibrate) navigator.vibrate([80, 40, 80, 40, 80]);
+    // Vibración — patrón corto repetitivo
+    function vibLoop() {
+      if (!holdTimer) return;
+      if (navigator.vibrate) navigator.vibrate(40);
+      window._vibTimeout = setTimeout(vibLoop, 120);
+    }
+    vibLoop();
 
     // Anillo de progreso
     const progress = document.getElementById('btn-progress');
@@ -894,8 +916,7 @@
       const elapsed = Date.now() - holdStart;
       const pct = Math.min((elapsed / HOLD_DURATION) * 100, 100);
       progress.style.background = `conic-gradient(var(--gold) ${pct}%, transparent ${pct}%)`;
-      if (navigator.vibrate) navigator.vibrate(20);
-    }, 100);
+    }, 50);
 
     holdTimer = setTimeout(() => { completarCaga(); }, HOLD_DURATION);
   }
@@ -904,8 +925,11 @@
     if (!holdTimer && !holdInterval) return;
     if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
     if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
+    if (window._vibTimeout) { clearTimeout(window._vibTimeout); window._vibTimeout = null; }
+    if (navigator.vibrate) navigator.vibrate(0); // parar vibración
     const btn = document.getElementById('btn-cagar');
     btn.classList.remove('holding');
+    btn.style.transform = '';
     const progress = document.getElementById('btn-progress');
     progress.classList.remove('active');
     progress.style.background = 'conic-gradient(var(--gold) 0%, transparent 0%)';
