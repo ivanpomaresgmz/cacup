@@ -1104,9 +1104,9 @@
         await sb.from('password_resets').insert({ usuario_id: user.id, token_hash: tokenHash, expires_at: expiresAt });
 
         const link = `${location.origin}${location.pathname}?reset=${token}`;
-        const resendRes = await fetch(`${SUPABASE_URL}/functions/v1/send-reset-email`, {
+        const resendRes = await fetch('/api/send-reset-email', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ to: email, link })
         });
         const resendData = await resendRes.json();
