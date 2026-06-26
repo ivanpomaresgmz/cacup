@@ -155,6 +155,7 @@
       object-fit:cover; border-radius:50%;
       pointer-events:none;
       display:none;
+      mix-blend-mode: screen;
     }
     .btn-cagar-label { display:none; }
     .btn-cagar-progress {
@@ -196,6 +197,7 @@
       object-fit:contain;
       border-radius:20px;
       display:block;
+      mix-blend-mode: screen;
     }
     .frase-cuenta { font-family:'Bebas Neue',sans-serif; font-size:140px; color:var(--gold); line-height:1; animation:pulseCuenta 1s ease-in-out infinite; }
     @keyframes pulseCuenta { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
@@ -1065,8 +1067,13 @@
       });
     }
     vidS.onended = () => {
-      // Pausa 10s en último frame, luego vuelve a reproducir
+      // Volver a estático mientras esperamos los 10s
+      vidS.style.display = 'none';
+      stat.style.display = 'block';
       window._saludandoTimeout = setTimeout(() => {
+        if (cagandose) return;
+        stat.style.display = 'none';
+        vidS.style.display = 'block';
         vidS.currentTime = 0;
         vidS.play().catch(() => { mostrarEstatico(); });
       }, 10000);
@@ -1139,7 +1146,6 @@
     cagandose = true;
     if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
 
-    reproducirSonido();
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
     const frase = FRASES_CADENA[Math.floor(Math.random() * FRASES_CADENA.length)];
