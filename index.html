@@ -987,7 +987,6 @@
     const l=ligaActual(); if(!l) return;
     document.getElementById('liga-nombre-display').textContent=l.ligaNombre;
     document.getElementById('liga-emoji-display').textContent=l.ligaEmoji||'🏆';
-    document.getElementById('liga-emoji-picker').style.display='none';
     if(timerInterval)clearInterval(timerInterval);
     actualizarTimer(); timerInterval=setInterval(actualizarTimer,60000);
     await cargarClasificacion(); suscribirseRealtime();
