@@ -1101,7 +1101,8 @@
 
         // Invalidar tokens anteriores y crear uno nuevo
         await sb.from('password_resets').update({ used: true }).eq('usuario_id', user.id).eq('used', false);
-        await sb.from('password_resets').insert({ usuario_id: user.id, token_hash: tokenHash, expires_at: expiresAt });
+        const { data: ins, error: insErr } = await sb.from('password_resets').insert({ usuario_id: user.id, token_hash: tokenHash, expires_at: expiresAt }).select();
+        console.log('[Reset insert]', ins, insErr);
 
         const link = `${location.origin}${location.pathname}?reset=${token}`;
         const resendRes = await fetch('/api/send-reset-email', {
@@ -1133,8 +1134,10 @@
       .select('usuario_id, expires_at')
       .eq('token_hash', tokenHash)
       .eq('used', false)
-      .single();
+      .maybeSingle();
+    console.log('[Verify token] hash:', tokenHash.slice(0,12)+'...', '→ data:', data, 'error:', error);
     if (error || !data) return false;
+    console.log('[Verify token] expires_at:', data.expires_at, 'now:', new Date().toISOString());
     if (new Date(data.expires_at) < new Date()) return false;
     _resetTokenHash = tokenHash;
     _resetUsuarioId = data.usuario_id;
