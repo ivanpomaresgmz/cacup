@@ -896,6 +896,11 @@
     vidC.currentTime = 0;
     vidC.play().catch(() => {});
 
+    // Desbloquear vídeo de celebración en iOS: play+pause dentro del gesto de usuario
+    const vidCel = document.getElementById('vid-celebracion');
+    if (vidCel.readyState === 0) vidCel.load();
+    vidCel.play().then(() => vidCel.pause()).catch(() => {});
+
     // Sonido de pedo
     reproducirSonido();
 
@@ -1088,58 +1093,63 @@
   let ptrDist = 0;
   let ptrActive = false;
   const PTR_THRESHOLD = 70;
-  const ptrEl = document.getElementById('ptr-indicator');
+  // ptrEl evaluado en runtime para evitar null cuando el DOM aún no cargó
+  function getPTR() { return document.getElementById('ptr-indicator'); }
 
   function hidePTR() {
-    ptrEl.style.transition = 'transform 0.2s, opacity 0.2s';
-    ptrEl.style.transform = 'translateX(-50%) translateY(-44px)';
-    ptrEl.style.opacity = '0';
+    const el = getPTR(); if (!el) return;
+    el.style.transition = 'transform 0.2s, opacity 0.2s';
+    el.style.transform = 'translateX(-50%) translateY(-44px)';
+    el.style.opacity = '0';
   }
 
-  document.body.addEventListener('touchstart', e => {
+  // Escuchar en document (no body) para capturar eventos de elementos position:fixed en iOS
+  document.addEventListener('touchstart', e => {
     const scr = document.querySelector('.screen.active');
     if (!scr || scr.id === 'screen-auth') return;
     if ((scr.scrollTop || 0) > 4) return;
     ptrStartY = e.touches[0].pageY;
     ptrDist = 0;
     ptrActive = true;
-  }, { passive: true, capture: false });
+  }, { passive: true, capture: true });
 
-  document.body.addEventListener('touchmove', e => {
+  document.addEventListener('touchmove', e => {
     if (!ptrActive) return;
+    const el = getPTR(); if (!el) return;
     const scr = document.querySelector('.screen.active');
     if (scr && (scr.scrollTop || 0) > 4) { ptrActive = false; hidePTR(); return; }
     const dy = e.touches[0].pageY - ptrStartY;
     if (dy <= 0) { ptrActive = false; hidePTR(); return; }
     ptrDist = dy;
     const pull = Math.min(dy * 0.38, 48);
-    ptrEl.style.transition = 'none';
-    ptrEl.style.opacity = Math.min(dy / PTR_THRESHOLD, 1).toFixed(2);
-    ptrEl.style.transform = `translateX(-50%) translateY(${pull - 44}px)`;
+    el.style.transition = 'none';
+    el.style.opacity = Math.min(dy / PTR_THRESHOLD, 1).toFixed(2);
+    el.style.transform = `translateX(-50%) translateY(${pull - 44}px)`;
     if (dy >= PTR_THRESHOLD) {
-      ptrEl.textContent = '↑ Suelta para actualizar';
-      ptrEl.style.background = 'var(--gold)';
-      ptrEl.style.color = '#000';
+      el.textContent = '↑ Suelta para actualizar';
+      el.style.background = 'var(--gold)';
+      el.style.color = '#000';
     } else {
-      ptrEl.textContent = '↓ Desliza para actualizar';
-      ptrEl.style.background = '#2a2a2a';
-      ptrEl.style.color = 'var(--text)';
+      el.textContent = '↓ Desliza para actualizar';
+      el.style.background = '#2a2a2a';
+      el.style.color = 'var(--text)';
     }
-  }, { passive: true, capture: false });
+  }, { passive: true, capture: true });
 
-  document.body.addEventListener('touchend', () => {
+  document.addEventListener('touchend', () => {
     if (!ptrActive) return;
     ptrActive = false;
-    if (ptrDist >= PTR_THRESHOLD) {
-      ptrEl.textContent = '⟳ Actualizando...';
-      ptrEl.style.transition = 'transform 0.2s';
-      ptrEl.style.transform = 'translateX(-50%) translateY(8px)';
+    const el = getPTR();
+    if (ptrDist >= PTR_THRESHOLD && el) {
+      el.textContent = '⟳ Actualizando...';
+      el.style.transition = 'transform 0.2s';
+      el.style.transform = 'translateX(-50%) translateY(8px)';
       setTimeout(() => window.location.reload(), 400);
     } else {
       hidePTR();
     }
     ptrDist = 0;
-  }, { capture: false });
+  }, { capture: true });
 </script>
 
 <!-- PTR INDICATOR -->
