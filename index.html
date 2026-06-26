@@ -1088,7 +1088,8 @@
     btn.textContent = '...'; btn.disabled = true;
 
     try {
-      const { data: user } = await sb.from('usuarios').select('id').eq('email', email).single();
+      const { data: user, error: userErr } = await sb.from('usuarios').select('id').eq('email', email).maybeSingle();
+      console.log('[Reset] buscando email:', email, '→ user:', user, 'error:', userErr);
 
       // Siempre mostrar el mismo mensaje (no revelar si el email existe)
       const msgOk = '✅ Si ese email está registrado recibirás un link en breve.\nRevisa también la carpeta de spam.';
