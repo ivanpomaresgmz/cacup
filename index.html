@@ -78,6 +78,7 @@
     .field select option { background:var(--surface2); }
     .error-msg { color:var(--danger); font-size:13px; text-align:center; display:none; }
     .success-msg { color:var(--green); font-size:13px; text-align:center; display:none; }
+    .forgot-btn { background:none; border:none; color:var(--muted); font-size:13px; cursor:pointer; text-decoration:underline; margin-top:-8px; }
     /* TOGGLE */
     .toggle-row { display:flex; align-items:center; justify-content:space-between; background:var(--surface2); border-radius:12px; padding:14px 16px; }
     .toggle-label { font-size:15px; }
@@ -274,9 +275,33 @@
       <label>Repite contraseña</label>
       <input type="password" id="auth-password2" placeholder="••••••••" autocomplete="new-password" />
     </div>
+    <div class="field" id="field-email" style="display:none;">
+      <label>Email <span style="color:var(--muted);font-size:11px;">(para recuperar contraseña)</span></label>
+      <input type="email" id="auth-email" placeholder="tu@email.com" autocomplete="email" />
+    </div>
     <div class="error-msg" id="auth-error"></div>
     <button class="btn btn-primary" id="auth-btn" onclick="handleAuth()">Entrar</button>
+    <button class="forgot-btn" id="forgot-btn" onclick="showScreen('screen-reset')">¿Olvidaste tu contraseña?</button>
   </div>
+</div>
+
+<!-- ══ RECUPERAR CONTRASEÑA ══ -->
+<div class="screen form-screen" id="screen-reset">
+  <button class="back-btn" onclick="showScreen('screen-auth')">←</button>
+  <div class="form-header"><h2>RECUPERAR</h2><p>Te enviaremos un link a tu email</p></div>
+  <div class="field"><label>Tu email</label><input type="email" id="reset-email" placeholder="tu@email.com" autocomplete="email" /></div>
+  <button class="btn btn-primary" id="reset-btn" onclick="solicitarReset()">Enviar link 📧</button>
+  <div class="error-msg" id="reset-error"></div>
+  <div class="success-msg" id="reset-success" style="font-size:15px;line-height:1.5;"></div>
+</div>
+
+<!-- ══ NUEVA CONTRASEÑA ══ -->
+<div class="screen form-screen" id="screen-nueva-pass">
+  <div class="form-header"><h2>NUEVA CLAVE</h2><p>Elige una nueva contraseña</p></div>
+  <div class="field"><label>Nueva contraseña</label><input type="password" id="nueva-pass" placeholder="••••••••" /></div>
+  <div class="field"><label>Repite la contraseña</label><input type="password" id="nueva-pass2" placeholder="••••••••" /></div>
+  <button class="btn btn-primary" id="nueva-pass-btn" onclick="cambiarPassword()">Guardar contraseña</button>
+  <div class="error-msg" id="nueva-pass-error"></div>
 </div>
 
 <!-- ══ CREAR LIGA ══ -->
@@ -425,6 +450,7 @@
   const SUPABASE_URL = 'https://gnrocanwmuceasucequz.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imducm9jYW53bXVjZWFzdWNlcXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDU2NjIsImV4cCI6MjA5NjYyMTY2Mn0.PIRTT2ms8k8H9s0-oa5zyfq1vuXVpaLuXyb7QmEPKnQ';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const RESEND_KEY = 're_4sbv73wX_PBgaF2hyyDhRDobGHVGzEAk8';
 
   // ─── ESTADO ────────────────────────────────────────────────
   let usuario = null; // { id, username, emoji, sonido, vibracion, discreto }
@@ -455,6 +481,8 @@
     document.getElementById('tab-registro').classList.toggle('active', mode==='registro');
     document.getElementById('auth-btn').textContent = mode==='login' ? 'Entrar' : 'Crear cuenta';
     document.getElementById('field-password2').style.display = mode==='registro' ? 'flex' : 'none';
+    document.getElementById('field-email').style.display = mode==='registro' ? 'flex' : 'none';
+    document.getElementById('forgot-btn').style.display = mode==='login' ? 'block' : 'none';
     document.getElementById('auth-error').style.display = 'none';
   }
 
@@ -482,7 +510,8 @@
         const { data: existe } = await sb.from('usuarios').select('id').eq('username', username).single();
         if (existe) { errEl.textContent='Ese usuario ya está cogido. Prueba otro.'; errEl.style.display='block'; btn.textContent='Crear cuenta'; btn.disabled=false; return; }
 
-        const { data: nuevo, error } = await sb.from('usuarios').insert({ username, password_hash: hash }).select().single();
+        const email = document.getElementById('auth-email').value.trim().toLowerCase() || null;
+        const { data: nuevo, error } = await sb.from('usuarios').insert({ username, password_hash: hash, email }).select().single();
         if (error) { errEl.textContent='Error al crear cuenta.'; errEl.style.display='block'; btn.textContent='Crear cuenta'; btn.disabled=false; return; }
         usuario = nuevo;
 
@@ -1041,6 +1070,110 @@
     showScreen('screen-final');
   }
 
+  // ─── RECUPERAR CONTRASEÑA ─────────────────────────────────
+  function generarToken() {
+    const arr = new Uint8Array(32);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function solicitarReset() {
+    const email = document.getElementById('reset-email').value.trim().toLowerCase();
+    const errEl = document.getElementById('reset-error');
+    const okEl = document.getElementById('reset-success');
+    errEl.style.display = 'none'; okEl.style.display = 'none';
+    if (!email) { errEl.textContent = 'Introduce tu email'; errEl.style.display = 'block'; return; }
+
+    const btn = document.getElementById('reset-btn');
+    btn.textContent = '...'; btn.disabled = true;
+
+    try {
+      const { data: user } = await sb.from('usuarios').select('id').eq('email', email).single();
+
+      // Siempre mostrar el mismo mensaje (no revelar si el email existe)
+      const msgOk = '✅ Si ese email está registrado recibirás un link en breve.\nRevisa también la carpeta de spam.';
+
+      if (user) {
+        const token = generarToken();
+        const tokenHash = await hashPassword(token);
+        const expiresAt = new Date(Date.now() + 3600000).toISOString();
+
+        // Invalidar tokens anteriores y crear uno nuevo
+        await sb.from('password_resets').update({ used: true }).eq('usuario_id', user.id).eq('used', false);
+        await sb.from('password_resets').insert({ usuario_id: user.id, token_hash: tokenHash, expires_at: expiresAt });
+
+        const link = `${location.origin}${location.pathname}?reset=${token}`;
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'CaCup <onboarding@resend.dev>',
+            to: email,
+            subject: '💩 Recupera tu contraseña de CaCup',
+            html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0f0f0f;color:#f0f0f0;border-radius:16px;">
+              <h1 style="font-size:36px;color:#f5c400;margin:0 0 8px;">CaCup 💩</h1>
+              <p style="color:#888;margin:0 0 24px;">Alguien solicitó cambiar la contraseña de tu cuenta.</p>
+              <a href="${link}" style="display:inline-block;background:#f5c400;color:#000;font-weight:700;padding:14px 28px;border-radius:12px;text-decoration:none;font-size:16px;">Cambiar contraseña</a>
+              <p style="color:#555;font-size:12px;margin-top:24px;">Este link caduca en 1 hora. Si no lo pediste, ignora este email.</p>
+            </div>`
+          })
+        });
+      }
+
+      okEl.textContent = msgOk;
+      okEl.style.display = 'block';
+    } catch(e) {
+      errEl.textContent = 'Error al enviar el email. Inténtalo de nuevo.';
+      errEl.style.display = 'block';
+    }
+
+    btn.textContent = 'Enviar link 📧'; btn.disabled = false;
+  }
+
+  let _resetTokenHash = null;
+  let _resetUsuarioId = null;
+
+  async function verificarTokenReset(token) {
+    const tokenHash = await hashPassword(token);
+    const { data, error } = await sb.from('password_resets')
+      .select('usuario_id, expires_at')
+      .eq('token_hash', tokenHash)
+      .eq('used', false)
+      .single();
+    if (error || !data) return false;
+    if (new Date(data.expires_at) < new Date()) return false;
+    _resetTokenHash = tokenHash;
+    _resetUsuarioId = data.usuario_id;
+    return true;
+  }
+
+  async function cambiarPassword() {
+    const pass = document.getElementById('nueva-pass').value;
+    const pass2 = document.getElementById('nueva-pass2').value;
+    const errEl = document.getElementById('nueva-pass-error');
+    errEl.style.display = 'none';
+    if (pass.length < 6) { errEl.textContent = 'Mínimo 6 caracteres'; errEl.style.display = 'block'; return; }
+    if (pass !== pass2) { errEl.textContent = 'Las contraseñas no coinciden'; errEl.style.display = 'block'; return; }
+    if (!_resetUsuarioId) { errEl.textContent = 'Link inválido. Solicita uno nuevo.'; errEl.style.display = 'block'; return; }
+
+    const btn = document.getElementById('nueva-pass-btn');
+    btn.textContent = '...'; btn.disabled = true;
+
+    try {
+      const hash = await hashPassword(pass);
+      await sb.from('usuarios').update({ password_hash: hash }).eq('id', _resetUsuarioId);
+      await sb.from('password_resets').update({ used: true }).eq('token_hash', _resetTokenHash);
+      _resetTokenHash = null; _resetUsuarioId = null;
+      history.replaceState({}, '', location.pathname);
+      showScreen('screen-auth');
+      showToast('✅ Contraseña actualizada. Ya puedes entrar.');
+    } catch(e) {
+      errEl.textContent = 'Error al guardar. Inténtalo de nuevo.';
+      errEl.style.display = 'block';
+      btn.textContent = 'Guardar contraseña'; btn.disabled = false;
+    }
+  }
+
   // ─── COMPARTIR ─────────────────────────────────────────────
   function getLink(){const l=ligaActual();return l?`${location.origin}${location.pathname}?liga=${l.ligaCodigo}`:'';}
   function compartirLink(){const l=ligaActual();if(!l)return;window.open(`https://wa.me/?text=${encodeURIComponent(`💩 Te reto a la CaCup "${l.ligaNombre}". ¿Tienes lo que hace falta? ${getLink()}`)}`, '_blank');}
@@ -1048,6 +1181,16 @@
 
   // ─── INIT ─────────────────────────────────────────────────
   async function init() {
+    // ¿Viene de un link de recuperación de contraseña?
+    const resetToken = new URLSearchParams(location.search).get('reset');
+    if (resetToken) {
+      const valido = await verificarTokenReset(resetToken);
+      if (valido) { showScreen('screen-nueva-pass'); return; }
+      // Token inválido o expirado — limpiar URL y continuar con flujo normal
+      history.replaceState({}, '', location.pathname);
+      showToast('❌ El link ha caducado. Solicita uno nuevo.');
+    }
+
     // ¿Hay sesión guardada?
     const session = localStorage.getItem('cacup_session');
     if (session) {
