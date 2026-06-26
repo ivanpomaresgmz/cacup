@@ -1138,7 +1138,7 @@
     console.log('[Verify token] hash:', tokenHash.slice(0,12)+'...', '→ data:', data, 'error:', error);
     if (error || !data) return false;
     console.log('[Verify token] expires_at:', data.expires_at, 'now:', new Date().toISOString());
-    if (new Date(data.expires_at) < new Date()) return false;
+    if (new Date(data.expires_at + 'Z') < new Date()) return false;
     _resetTokenHash = tokenHash;
     _resetUsuarioId = data.usuario_id;
     return true;
