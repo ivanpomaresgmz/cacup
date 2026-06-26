@@ -238,6 +238,20 @@
     .spinner { width:32px; height:32px; border:3px solid #333; border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
     @keyframes spin { to{transform:rotate(360deg)} }
     .mt-auto { margin-top:auto; }
+    /* BOTTOM SHEETS */
+    .sheet-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:800; display:none; align-items:flex-end; justify-content:center; }
+    .sheet-overlay.show { display:flex; }
+    .sheet { background:var(--surface); border-radius:20px 20px 0 0; padding:8px 0 32px; width:100%; max-width:480px; }
+    .sheet-handle { width:40px; height:4px; background:#333; border-radius:2px; margin:12px auto 16px; }
+    .sheet-title { font-family:'Bebas Neue',sans-serif; font-size:18px; color:var(--muted); letter-spacing:2px; padding:0 20px 12px; }
+    .sheet-option { display:flex; align-items:center; gap:14px; padding:14px 20px; font-size:16px; cursor:pointer; transition:background 0.15s; }
+    .sheet-option:active { background:var(--surface2); }
+    .sheet-option-icon { font-size:22px; width:28px; text-align:center; }
+    .sheet-option.danger { color:var(--danger); }
+    .sheet-divider { height:1px; background:#2a2a2a; margin:6px 0; }
+    .miembro-row { display:flex; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid #222; }
+    .admin-badge { font-size:10px; color:var(--gold); background:var(--surface2); padding:2px 8px; border-radius:20px; letter-spacing:1px; }
+    .btn-remove { background:none; border:none; color:var(--danger); font-size:22px; cursor:pointer; padding:4px; line-height:1; }
   </style>
 </head>
 <body>
@@ -356,15 +370,13 @@
 <!-- ══ SALA LIGA ══ -->
 <div class="screen" id="screen-liga">
   <div class="liga-header">
-    <div class="liga-header-emoji" id="liga-emoji-display" onclick="toggleLigaEmojiPicker()">🏆</div>
+    <div class="liga-header-emoji" id="liga-emoji-display">🏆</div>
     <div class="liga-header-center">
       <div class="liga-nombre" id="liga-nombre-display"></div>
       <div class="liga-timer" id="liga-timer"></div>
     </div>
-    <button class="liga-share-btn" onclick="compartirLigaActual()" title="Invitar amigos">📤</button>
+    <button class="liga-share-btn" onclick="abrirMenuLiga()" title="Opciones" style="font-size:24px;font-weight:700;letter-spacing:1px;">⋮</button>
   </div>
-  <!-- Picker emoji de liga -->
-  <div class="liga-emoji-picker" id="liga-emoji-picker"></div>
   <div class="clasificacion">
     <div class="clasificacion-title">Clasificación</div>
     <div id="clasificacion-list"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
@@ -424,6 +436,68 @@
     <div class="shame-sub">El cagador más flojo de la liga</div>
   </div>
   <button class="btn btn-primary" onclick="navTo('screen-misligas')">Ver mis ligas 🏆</button>
+</div>
+
+<!-- ══ SHEET: MENÚ LIGA ══ -->
+<div class="sheet-overlay" id="sheet-menu" onclick="cerrarSheet('sheet-menu', event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="sheet-menu-titulo">OPCIONES</div>
+    <div id="sheet-menu-admin">
+      <div class="sheet-option" onclick="cerrarSheet('sheet-menu'); abrirEditarLiga()">
+        <span class="sheet-option-icon">✏️</span><span>Editar liga</span>
+      </div>
+      <div class="sheet-option" onclick="cerrarSheet('sheet-menu'); abrirMiembros()">
+        <span class="sheet-option-icon">👥</span><span>Miembros</span>
+      </div>
+    </div>
+    <div class="sheet-option" onclick="cerrarSheet('sheet-menu'); compartirLigaActual()">
+      <span class="sheet-option-icon">📤</span><span>Compartir liga</span>
+    </div>
+    <div id="sheet-menu-eliminar">
+      <div class="sheet-divider"></div>
+      <div class="sheet-option danger" onclick="cerrarSheet('sheet-menu'); abrirConfirmarEliminar()">
+        <span class="sheet-option-icon">🗑️</span><span>Eliminar liga</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHEET: EDITAR LIGA ══ -->
+<div class="sheet-overlay" id="sheet-editar" onclick="cerrarSheet('sheet-editar', event)">
+  <div class="sheet" style="padding-bottom:40px;">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">EDITAR LIGA</div>
+    <div style="padding:0 20px;display:flex;flex-direction:column;gap:16px;">
+      <div class="field"><label>Nombre</label><input type="text" id="editar-liga-nombre" maxlength="40" /></div>
+      <div class="field"><label>Emoji</label>
+        <div id="editar-liga-emojis" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;background:var(--surface2);border-radius:12px;padding:12px;"></div>
+      </div>
+      <button class="btn btn-primary" onclick="guardarEditarLiga()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHEET: MIEMBROS ══ -->
+<div class="sheet-overlay" id="sheet-miembros" onclick="cerrarSheet('sheet-miembros', event)">
+  <div class="sheet" style="padding-bottom:32px;">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">MIEMBROS</div>
+    <div id="miembros-list" style="max-height:55vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- ══ SHEET: CONFIRMAR ELIMINAR ══ -->
+<div class="sheet-overlay" id="sheet-eliminar" onclick="cerrarSheet('sheet-eliminar', event)">
+  <div class="sheet" style="padding-bottom:40px;">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚠️ ELIMINAR LIGA</div>
+    <p style="padding:0 20px 20px;color:var(--muted);font-size:14px;line-height:1.6;">¿Seguro que quieres eliminar esta liga? Se borrarán todos los datos permanentemente.</p>
+    <div style="padding:0 20px;display:flex;flex-direction:column;gap:8px;">
+      <button class="btn" style="background:var(--danger);color:#fff;font-size:20px;" onclick="eliminarLiga()">Sí, eliminar</button>
+      <button class="btn btn-secondary" onclick="cerrarSheet('sheet-eliminar')">Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══ BOTTOM NAV ══ -->
@@ -548,7 +622,8 @@
       ligaFechaFin: j.ligas.fecha_fin,
       ligaEmoji: j.ligas.emoji || '🏆',
       jugadorId: j.id,
-      jugadorNombre: j.nombre
+      jugadorNombre: j.nombre,
+      esAdmin: j.es_admin || false
     }));
     ligaActualIdx = 0;
   }
@@ -714,10 +789,10 @@
     const {data:liga,error:le}=await sb.from('ligas').insert({nombre,codigo,duracion:`${dias}d`,fecha_fin:fechaFin.toISOString()}).select().single();
     if(le){errEl.textContent='Error al crear la liga.';errEl.style.display='block';return;}
 
-    const {data:jugador,error:je}=await sb.from('jugadores').insert({liga_id:liga.id,nombre:jugadorNombre,emoji:usuario.emoji||'💩',usuario_id:usuario.id}).select().single();
+    const {data:jugador,error:je}=await sb.from('jugadores').insert({liga_id:liga.id,nombre:jugadorNombre,emoji:usuario.emoji||'💩',usuario_id:usuario.id,es_admin:true}).select().single();
     if(je){errEl.textContent='Error al crear el jugador.';errEl.style.display='block';return;}
 
-    misLigas.push({ligaId:liga.id,ligaCodigo:codigo,ligaNombre:nombre,ligaFechaFin:fechaFin.toISOString(),ligaEmoji:'🏆',jugadorId:jugador.id,jugadorNombre});
+    misLigas.push({ligaId:liga.id,ligaCodigo:codigo,ligaNombre:nombre,ligaFechaFin:fechaFin.toISOString(),ligaEmoji:'🏆',jugadorId:jugador.id,jugadorNombre,esAdmin:true});
     ligaActualIdx=misLigas.length-1;
 
     document.getElementById('invite-liga-nombre').textContent=nombre;
@@ -743,7 +818,7 @@
     const {data:jugador,error:je}=await sb.from('jugadores').insert({liga_id:liga.id,nombre,emoji:usuario.emoji||'💩',usuario_id:usuario.id}).select().single();
     if(je){errEl.textContent='Error al unirte.';errEl.style.display='block';return;}
 
-    misLigas.push({ligaId:liga.id,ligaCodigo:codigo,ligaNombre:liga.nombre,ligaFechaFin:liga.fecha_fin,ligaEmoji:liga.emoji||'🏆',jugadorId:jugador.id,jugadorNombre:nombre});
+    misLigas.push({ligaId:liga.id,ligaCodigo:codigo,ligaNombre:liga.nombre,ligaFechaFin:liga.fecha_fin,ligaEmoji:liga.emoji||'🏆',jugadorId:jugador.id,jugadorNombre:nombre,esAdmin:false});
     ligaActualIdx=misLigas.length-1;
     await cargarLiga(); navTo('screen-liga');
   }
@@ -783,28 +858,118 @@
   // ─── EMOJI LIGA ────────────────────────────────────────────
   const EMOJIS_LIGA = ['🏆','⚽','🎯','💀','🔥','👑','💩','🎪','🤡','🥊','🐉','🦁','🐻','🌋','💣','⚡','🎲','🎭','🏴‍☠️','🤖','👻','🎃','🥷','🦄'];
 
-  function toggleLigaEmojiPicker() {
-    const picker = document.getElementById('liga-emoji-picker');
-    if (picker.style.display === 'grid') {
-      picker.style.display = 'none';
-      return;
-    }
-    const l = ligaActual(); if (!l) return;
-    picker.innerHTML = EMOJIS_LIGA.map(e => `
-      <div class="emoji-opt ${e===(l.ligaEmoji||'🏆')?'selected':''}"
-           onclick="seleccionarEmojiLiga('${e}')">${e}</div>
-    `).join('');
-    picker.style.display = 'grid';
+  // ─── SHEETS ────────────────────────────────────────────────
+  function cerrarSheet(id, e) {
+    const overlay = document.getElementById(id);
+    if (!e || e.target === overlay) overlay.classList.remove('show');
   }
 
-  async function seleccionarEmojiLiga(e) {
+  function abrirMenuLiga() {
     const l = ligaActual(); if (!l) return;
-    l.ligaEmoji = e;
-    document.getElementById('liga-emoji-display').textContent = e;
-    document.getElementById('liga-emoji-picker').style.display = 'none';
-    // Guardar en BD
-    await sb.from('ligas').update({ emoji: e }).eq('id', l.ligaId);
-    showToast('✅ Emoji guardado');
+    const esAdmin = l.esAdmin;
+    document.getElementById('sheet-menu-titulo').textContent = l.ligaNombre.toUpperCase();
+    document.getElementById('sheet-menu-admin').style.display = esAdmin ? '' : 'none';
+    document.getElementById('sheet-menu-eliminar').style.display = esAdmin ? '' : 'none';
+    document.getElementById('sheet-menu').classList.add('show');
+  }
+
+  // ─── EDITAR LIGA ───────────────────────────────────────────
+  let _editarEmoji = null;
+
+  function abrirEditarLiga() {
+    const l = ligaActual(); if (!l) return;
+    document.getElementById('editar-liga-nombre').value = l.ligaNombre;
+    _editarEmoji = l.ligaEmoji || '🏆';
+    document.getElementById('editar-liga-emojis').innerHTML = EMOJIS_LIGA.map(e =>
+      `<div class="emoji-opt ${e === _editarEmoji ? 'selected' : ''}" onclick="seleccionarEmojiEditar('${e}')">${e}</div>`
+    ).join('');
+    document.getElementById('sheet-editar').classList.add('show');
+  }
+
+  function seleccionarEmojiEditar(e) {
+    _editarEmoji = e;
+    document.querySelectorAll('#editar-liga-emojis .emoji-opt').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+  }
+
+  async function guardarEditarLiga() {
+    const l = ligaActual(); if (!l) return;
+    const nombre = document.getElementById('editar-liga-nombre').value.trim();
+    if (!nombre) return;
+    await sb.from('ligas').update({ nombre, emoji: _editarEmoji }).eq('id', l.ligaId);
+    l.ligaNombre = nombre;
+    l.ligaEmoji = _editarEmoji;
+    document.getElementById('liga-nombre-display').textContent = nombre;
+    document.getElementById('liga-emoji-display').textContent = _editarEmoji;
+    cerrarSheet('sheet-editar');
+    showToast('✅ Liga actualizada');
+  }
+
+  // ─── MIEMBROS ──────────────────────────────────────────────
+  async function abrirMiembros() {
+    document.getElementById('sheet-miembros').classList.add('show');
+    await cargarMiembros();
+  }
+
+  async function cargarMiembros() {
+    const l = ligaActual(); if (!l) return;
+    const list = document.getElementById('miembros-list');
+    list.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    const { data } = await sb.from('jugadores').select().eq('liga_id', l.ligaId).order('total_cacas', { ascending: false });
+    if (!data) return;
+    list.innerHTML = data.map(j => `
+      <div class="miembro-row">
+        <div style="font-size:26px;">${j.emoji}</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:15px;">${j.nombre}${j.id === l.jugadorId ? ' (tú)' : ''}</div>
+          <div style="font-size:12px;color:var(--muted);">${j.total_cacas} 💩</div>
+        </div>
+        ${l.esAdmin ? `
+          <div style="display:flex;align-items:center;gap:10px;">
+            <label class="toggle" title="Admin">
+              <input type="checkbox" ${j.es_admin ? 'checked' : ''} ${j.id === l.jugadorId ? 'disabled' : ''}
+                onchange="toggleAdminMiembro('${j.id}', this.checked)" />
+              <span class="toggle-slider"></span>
+            </label>
+            ${j.id !== l.jugadorId ? `<button class="btn-remove" onclick="eliminarMiembro('${j.id}','${j.nombre.replace(/'/g,"\\'")}')">✕</button>` : ''}
+          </div>
+        ` : `
+          ${j.es_admin ? '<span class="admin-badge">ADMIN</span>' : ''}
+        `}
+      </div>`).join('');
+  }
+
+  async function toggleAdminMiembro(jugadorId, esAdmin) {
+    await sb.from('jugadores').update({ es_admin: esAdmin }).eq('id', jugadorId);
+  }
+
+  async function eliminarMiembro(jugadorId, nombre) {
+    if (!confirm(`¿Eliminar a ${nombre} de la liga?`)) return;
+    await sb.from('cacas').delete().eq('jugador_id', jugadorId);
+    await sb.from('jugadores').delete().eq('id', jugadorId);
+    await cargarMiembros();
+    await cargarClasificacion();
+    showToast(`✅ ${nombre} eliminado`);
+  }
+
+  // ─── ELIMINAR LIGA ─────────────────────────────────────────
+  function abrirConfirmarEliminar() {
+    document.getElementById('sheet-eliminar').classList.add('show');
+  }
+
+  async function eliminarLiga() {
+    const l = ligaActual(); if (!l) return;
+    cerrarSheet('sheet-eliminar');
+    await sb.from('cacas').delete().eq('liga_id', l.ligaId);
+    await sb.from('jugadores').delete().eq('liga_id', l.ligaId);
+    await sb.from('ligas').delete().eq('id', l.ligaId);
+    misLigas.splice(ligaActualIdx, 1);
+    ligaActualIdx = Math.max(0, ligaActualIdx - 1);
+    if (realtimeSub) sb.removeChannel(realtimeSub);
+    if (timerInterval) clearInterval(timerInterval);
+    if (misLigas.length > 0) { await cargarLiga(); navTo('screen-liga'); }
+    else navTo('screen-misligas');
+    showToast('✅ Liga eliminada');
   }
 
   function compartirLigaActual() {
