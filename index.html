@@ -1103,7 +1103,7 @@
         await sb.from('password_resets').insert({ usuario_id: user.id, token_hash: tokenHash, expires_at: expiresAt });
 
         const link = `${location.origin}${location.pathname}?reset=${token}`;
-        await fetch('https://api.resend.com/emails', {
+        const resendRes = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1118,6 +1118,9 @@
             </div>`
           })
         });
+        const resendData = await resendRes.json();
+        console.log('[Resend]', resendRes.status, JSON.stringify(resendData));
+        if (!resendRes.ok) throw new Error(`Resend error ${resendRes.status}: ${JSON.stringify(resendData)}`);
       }
 
       okEl.textContent = msgOk;
